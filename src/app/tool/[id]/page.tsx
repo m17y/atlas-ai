@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Star, Heart, Share2, ExternalLink, Check, TrendingUp, Download, Eye, MessageSquare } from 'lucide-react'
+import { prisma } from '@/lib/prisma'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   return {
     title: '工具详情 - Atlas AI',
     description: '查看AI工具的详细信息、使用体验和用户评价',
@@ -11,19 +12,12 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export async function generateStaticParams() {
-  // 生成前8个工具的静态参数
-  const tools = [
-    { id: '1', name: 'ChatGPT' },
-    { id: '2', name: 'Midjourney' },
-    { id: '3', name: 'Claude' },
-    { id: '4', name: 'GitHub Copilot' },
-    { id: '5', name: 'Stable Diffusion' },
-    { id: '6', name: 'Runway' },
-    { id: '7', name: 'Notion AI' },
-    { id: '8', name: 'Gamma' },
-  ]
+  const tools = await prisma.tool.findMany({
+    select: { id: true },
+    take: 50,
+  })
   
-  return tools.map((tool) => ({
+  return tools.map((tool: { id: string }) => ({
     id: tool.id,
   }))
 }

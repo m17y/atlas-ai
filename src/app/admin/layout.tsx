@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
-  Tool,
+  Wrench,
   FolderTree,
   BarChart3,
   Settings,
@@ -18,7 +18,7 @@ import {
 
 const navItems = [
   { name: '仪表盘', href: '/admin', icon: LayoutDashboard },
-  { name: '工具管理', href: '/admin/tools', icon: Tool },
+  { name: '工具管理', href: '/admin/tools', icon: Wrench },
   { name: '分类管理', href: '/admin/categories', icon: FolderTree },
   { name: '统计分析', href: '/admin/analytics', icon: BarChart3 },
   { name: '系统设置', href: '/admin/settings', icon: Settings },

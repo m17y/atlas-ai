@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
   LayoutDashboard,
-  Tool,
+  Wrench,
   FolderTree,
   TrendingUp,
   Plus,
@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
     {
       name: '工具总数',
       value: stats.totalTools,
-      icon: Tool,
+      icon: Wrench,
       color: 'from-blue-500 to-cyan-500',
       href: '/admin/tools',
     },
@@ -156,7 +156,7 @@ export default async function AdminDashboard() {
               ))
             ) : (
               <div className="p-8 text-center text-slate-500">
-                <Tool className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+                <Wrench className="w-12 h-12 mx-auto mb-4 text-slate-300" />
                 <p>暂无工具数据</p>
                 <Link href="/admin/tools/new" className="text-primary-600 hover:text-primary-700 mt-2 inline-block">
                   立即添加
