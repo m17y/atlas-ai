@@ -208,7 +208,7 @@ export default async function CategoriesPage({ searchParams }: { searchParams: P
                         <h3 className="text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
                           <Link href={`/tool/${tool.id}`}>{tool.name}</Link>
                         </h3>
-                        <span className="text-xs text-slate-400">{tool.category}</span>
+                        <span className="text-xs text-slate-400">{(tool.category as any)?.name || tool.category || '未分类'}</span>
                       </div>
                       <button className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors">
                         <Heart className="w-4 h-4" />

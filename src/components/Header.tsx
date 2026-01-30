@@ -22,6 +22,8 @@ export default function Header() {
   const navItems = [
     { href: '/', label: '首页' },
     { href: '/categories', label: '分类' },
+    { href: '/trending', label: '排行榜' },
+    { href: '/insights', label: '趋势' },
     { href: '/news', label: 'AI新闻' },
     { href: '/tutorials', label: '教程' },
     { href: '/community', label: '社区' },
