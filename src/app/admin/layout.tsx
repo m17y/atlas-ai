@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -26,8 +27,100 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // 简单的认证检查 - 实际项目中应该使用更安全的认证方式
+    const adminAuth = localStorage.getItem('admin_auth')
+    if (adminAuth === 'true') {
+      setIsAuthenticated(true)
+    } else if (pathname !== '/admin/login') {
+      // 未登录，重定向到登录页
+      router.push('/admin/login')
+    }
+    setLoading(false)
+  }, [pathname, router])
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault()
+    // 简单演示：任意密码都能登录
+    localStorage.setItem('admin_auth', 'true')
+    setIsAuthenticated(true)
+    router.push('/admin')
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('admin_auth')
+    setIsAuthenticated(false)
+    router.push('/')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-500 mt-4">加载中...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // 登录页面
+  if (pathname === '/admin/login') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-600 via-purple-600 to-indigo-700 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900">管理后台</h1>
+              <p className="text-slate-500 mt-2">One-Coin AI</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">用户名</label>
+                <input
+                  type="text"
+                  placeholder="admin"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">密码</label>
+                <input
+                  type="password"
+                  placeholder="输入任意密码登录"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <button type="submit" className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors">
+                登录
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <Link href="/" className="text-primary-600 hover:text-primary-700 text-sm">
+                返回首页
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // 未认证，渲染空（或重定向）
+  if (!isAuthenticated) {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -43,7 +136,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-slate-900 text-white transform transition-transform duration-200 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        {/* Logo */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-slate-800">
           <Link href="/admin" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -59,7 +151,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="p-4 space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href
@@ -80,18 +171,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        {/* User section */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800">
-          <Link href="/" className="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white transition-colors">
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-3 px-4 py-3 w-full text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+          >
             <LogOut className="w-5 h-5" />
-            <span>返回前台</span>
-          </Link>
+            <span>退出登录</span>
+          </button>
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="lg:ml-64">
-        {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 h-16">
           <div className="flex items-center justify-between h-full px-4 lg:px-8">
             <div className="flex items-center space-x-4">
@@ -107,7 +198,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* User menu */}
               <div className="relative">
                 <button
                   className="flex items-center space-x-2 p-2 hover:bg-slate-100 rounded-lg"
@@ -125,7 +215,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link href="/admin/settings" className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                       账号设置
                     </Link>
-                    <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-100">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-100"
+                    >
                       退出登录
                     </button>
                   </div>
@@ -135,7 +228,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        {/* Page content */}
         <main className="p-4 lg:p-8">
           {children}
         </main>

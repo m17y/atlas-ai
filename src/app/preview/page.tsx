@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowRight, Home, FolderTree, TrendingUp, BarChart3, MessageSquare, Image, Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: '网站预览 - One-Coin AI',
+  title: '网站预览 - Atlas AI',
   description: '某科学的AI目录，探索、发现最新的人工智能工具与技术',
 }
 
@@ -17,7 +17,7 @@ export default function PreviewPage() {
             <div className="w-16 h-16 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-5xl font-bold">One-Coin AI</h1>
+            <h1 className="text-5xl font-bold">Atlas AI</h1>
           </div>
           <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed mt-6">
             某科学的AI目录，探索、发现最新的人工智能工具与技术。
@@ -174,8 +174,8 @@ export default function PreviewPage() {
         
         {/* Footer */}
         <footer className="text-center text-white/80">
-          <p>One-Coin AI - 某科学的AI目录，发现、探索、体验最新的人工智能工具与技术</p>
-          <p className="mt-2">© 2025 One-Coin AI. All rights reserved.</p>
+          <p>Atlas AI - 某科学的AI目录，发现、探索、体验最新的人工智能工具与技术</p>
+          <p className="mt-2">© 2025 Atlas AI. All rights reserved.</p>
         </footer>
       </div>
     </div>

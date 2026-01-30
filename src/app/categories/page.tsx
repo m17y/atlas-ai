@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Filter, Search, Grid, List, Star, Heart, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: '分类浏览 - Atlas AI',
+  title: '分类浏览 - One-Coin AI',
   description: '按类别浏览最新的人工智能工具和技术',
 }
 
@@ -132,7 +133,7 @@ export default function CategoriesPage() {
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="text-sm">
-            <a href="/" className="text-slate-500 hover:text-primary-600">首页</a>
+            <Link href="/" className="text-slate-500 hover:text-primary-600">首页</Link>
             <span className="mx-2 text-slate-400">/</span>
             <span className="text-slate-900">分类浏览</span>
           </nav>
@@ -151,7 +152,7 @@ export default function CategoriesPage() {
 
               <div className="space-y-2">
                 {categories.map((category) => (
-                  <a
+                  <Link
                     key={category.name}
                     href={`/category/${category.name}`}
                     className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
@@ -166,7 +167,7 @@ export default function CategoriesPage() {
                     }`}>
                       {category.count}
                     </span>
-                  </a>
+                  </Link>
                 ))}
               </div>
 
@@ -257,7 +258,7 @@ export default function CategoriesPage() {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
-                          <a href={`/tool/${tool.id}`}>{tool.name}</a>
+                          <Link href={`/tool/${tool.id}`}>{tool.name}</Link>
                         </h3>
                         <span className="text-xs text-slate-400">{tool.category}</span>
                       </div>
@@ -285,9 +286,9 @@ export default function CategoriesPage() {
                         <span className={`text-sm font-medium ${tool.isFree ? 'text-green-600' : 'text-slate-600'}`}>
                           {tool.price}
                         </span>
-                        <a href={`/tool/${tool.id}`} className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
+                        <Link href={`/tool/${tool.id}`} className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
                           查看 <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
