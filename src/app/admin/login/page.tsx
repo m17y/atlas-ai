@@ -30,14 +30,14 @@ export default function AdminLoginPage() {
 
       if (!res.ok) {
         setError(data.error || '登录失败')
+        setLoading(false)
         return
       }
 
-      router.push('/admin')
-      router.refresh()
+      await new Promise(resolve => setTimeout(resolve, 500))
+      window.location.href = '/admin'
     } catch (err) {
       setError('网络错误，请重试')
-    } finally {
       setLoading(false)
     }
   }
