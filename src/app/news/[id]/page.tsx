@@ -1,9 +1,10 @@
-import type { Metadata } from 'next'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { Calendar, ArrowLeft, Tag } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 import dynamic from 'next/dynamic'
 
 const MarkdownPreview = dynamic(
@@ -11,47 +12,64 @@ const MarkdownPreview = dynamic(
   { ssr: false }
 )
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params
-  
-  let newsItem = null
-  try {
-    const prisma = new PrismaClient()
-    newsItem = await prisma.news.findUnique({
-      where: { id }
-    })
-  } catch (e) {
-    console.error('Failed to fetch news:', e)
-  }
-  
-  if (!newsItem) {
-    return {
-      title: '新闻未找到 - One-Coin AI'
+interface NewsItem {
+  id: string
+  title: string
+  date: string
+  category: string
+  summary: string
+  content: string
+  image: string
+  tags: string
+}
+
+function Loading() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+      <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-slate-500 mt-4">加载中...</p>
+    </div>
+  )
+}
+
+export default function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const [newsItem, setNewsItem] = useState<NewsItem | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
+
+  useEffect(() => {
+    params.then(setResolvedParams)
+  }, [params])
+
+  useEffect(() => {
+    if (!resolvedParams) return
+
+    async function fetchNews() {
+      try {
+        const res = await fetch(`/api/news/${resolvedParams!.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          setNewsItem(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch news:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
-  
-  return {
-    title: `${newsItem.title} - AI新闻`,
-    description: newsItem.summary
-  }
-}
 
-async function getNews(id: string) {
-  try {
-    const prisma = new PrismaClient()
-    const newsItem = await prisma.news.findUnique({
-      where: { id }
-    })
-    return newsItem
-  } catch (e) {
-    console.error('Failed to fetch news:', e)
-    return null
-  }
-}
+    fetchNews()
+  }, [resolvedParams])
 
-export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const newsItem = await getNews(id)
+  if (loading || !resolvedParams) {
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <Header />
+        <Loading />
+        <Footer />
+      </main>
+    )
+  }
 
   if (!newsItem) {
     return (

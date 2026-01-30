@@ -1,10 +1,7 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-1. http://localhost:3000/admin/tools 没有显示工具列表，数据时空
-2. http://localhost:3000/admin/categories 没有显示分类列表，数据时空
-3. http://localhost:3000/admin/settings 404 
-4. http://localhost:3000/news/[id] 、http://localhost:3000/tutorials 实现后台可编辑的功能，默认编辑器时markdown
+
 ---
 
 ## 历史修复记录
@@ -13,10 +10,19 @@
 
 ### 2025-02-02
 
-**本次修复包含 2 项改进**
+**本次修复包含 4 项改进**
 
-1. ✅ **分类数据显示** - 重启开发服务器后 API 正常工作
-2. ✅ **Admin 登录问题** - 添加延迟确保 cookie 被正确处理
+1. ✅ **工具列表显示** - 数据库已有数据，API 正常工作
+2. ✅ **分类列表显示** - 数据库已有 10 个分类数据
+3. ✅ **/admin/settings 404** - 创建系统设置页面
+4. ✅ **新闻后台编辑** - 创建 News 数据模型、管理页面（Markdown 编辑器）
+
+**新增功能：**
+- `/admin/settings` - 系统设置页面
+- `/admin/news` - 新闻管理列表
+- `/admin/news/[id]` - 新闻编辑页面（Markdown）
+- News 数据模型和 API 路由
+- 前台新闻页面从数据库获取数据
 
 ---
 
@@ -88,6 +94,8 @@
 | 教程详情 | http://localhost:3000/tutorials/chatgpt-starter |
 | 工具详情 | http://localhost:3000/tool/tool_chatgpt |
 | 管理员登录 | http://localhost:3000/admin/login |
+| 新闻管理 | http://localhost:3000/admin/news |
+| 系统设置 | http://localhost:3000/admin/settings |
 
 ---
 
