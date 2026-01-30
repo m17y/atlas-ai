@@ -39,8 +39,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return
     }
     
-    const adminToken = document.cookie.split('; ').find(row => row.startsWith('admin_token='))
-    if (adminToken) {
+    const adminAuth = localStorage.getItem('admin_auth')
+    if (adminAuth === 'true') {
       setIsAuthenticated(true)
     } else {
       router.push('/admin/login')
@@ -49,8 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname, router])
 
   const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' })
-    document.cookie = 'admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+    localStorage.removeItem('admin_auth')
     setIsAuthenticated(false)
     router.push('/admin/login')
     router.refresh()

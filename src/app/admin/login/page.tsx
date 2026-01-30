@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
         return
       }
 
-      await new Promise(resolve => setTimeout(resolve, 500))
+      localStorage.setItem('admin_auth', 'true')
       window.location.href = '/admin'
     } catch (err) {
       setError('网络错误，请重试')
