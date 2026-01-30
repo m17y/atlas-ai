@@ -1,12 +1,36 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
+1. 访问报错 http://127.0.0.1:3000/
+Error: 
+  × You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  │ Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  │ 
+  │ 
+   ╭─[/Users/syf/Documents/trae_projects/atlas-ai/src/app/community/page.tsx:1:1]
+ 1 │ import { useState, useEffect } from 'react'
+   ·          ────────
+ 2 │ import type { Metadata } from 'next'
+ 3 │ import Header from '@/components/Header'
+ 4 │ import Footer from '@/components/Footer'
+   ╰────
 
+  × You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  │ Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  │ 
+  │ 
+   ╭─[/Users/syf/Documents/trae_projects/atlas-ai/src/app/community/page.tsx:1:1]
+ 1 │ import { useState, useEffect } from 'react'
+   ·                    ─────────
+ 2 │ import type { Metadata } from 'next'
+ 3 │ import Header from '@/components/Header'
+ 4 │ import Footer from '@/components/Footer'
+   ╰────
 ---
 
 ## 历史修复记录
 
-按时间线排序，简要总结每个修复周期。
+> 按时间线排序，简要总结每个修复周期。
 
 ### 2025-01-30
 
