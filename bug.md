@@ -1,7 +1,10 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-
+1. http://localhost:3000/admin/tools 没有显示工具列表，数据时空
+2. http://localhost:3000/admin/categories 没有显示分类列表，数据时空
+3. http://localhost:3000/admin/settings 404 
+4. http://localhost:3000/news/[id] 、http://localhost:3000/tutorials 实现后台可编辑的功能，默认编辑器时markdown
 ---
 
 ## 历史修复记录

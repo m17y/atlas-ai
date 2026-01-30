@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard,
   Wrench,
@@ -27,7 +27,7 @@ const navItems = [
   { name: '系统设置', href: '/admin/settings', icon: Settings },
 ]
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setLoading(false)
   }, [pathname, router])
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     localStorage.removeItem('admin_auth')
     setIsAuthenticated(false)
     router.push('/admin/login')
