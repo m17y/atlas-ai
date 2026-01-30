@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -32,21 +33,22 @@ function Loading() {
   )
 }
 
-export default function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function NewsDetailPage() {
+  const params = useParams()
   const [newsItem, setNewsItem] = useState<NewsItem | null>(null)
   const [loading, setLoading] = useState(true)
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
+
+  const newsId = params?.id as string
 
   useEffect(() => {
-    params.then(setResolvedParams)
-  }, [params])
-
-  useEffect(() => {
-    if (!resolvedParams) return
+    if (!newsId) {
+      setLoading(false)
+      return
+    }
 
     async function fetchNews() {
       try {
-        const res = await fetch(`/api/news/${resolvedParams!.id}`)
+        const res = await fetch(`/api/news/${newsId}`)
         if (res.ok) {
           const data = await res.json()
           setNewsItem(data)
@@ -59,9 +61,9 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
     }
 
     fetchNews()
-  }, [resolvedParams])
+  }, [newsId])
 
-  if (loading || !resolvedParams) {
+  if (loading) {
     return (
       <main className="min-h-screen bg-slate-50">
         <Header />
