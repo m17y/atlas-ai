@@ -86,7 +86,7 @@ export default async function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">欢迎回来，管理员！</h1>
-          <p className="text-slate-600 mt-1">这里是 Atlas AI 的管理后台，您可以在这里管理所有内容。</p>
+          <p className="text-slate-600 mt-1">这里是 One-Coin AI 的管理后台，您可以在这里管理所有内容。</p>
         </div>
         <Link href="/admin/tools/new" className="btn-primary flex items-center space-x-2">
           <Plus className="w-5 h-5" />

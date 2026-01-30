@@ -83,7 +83,7 @@ export default async function AdminAnalyticsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">统计分析</h1>
-        <p className="text-slate-600 mt-1">查看 Atlas AI 的数据概览</p>
+        <p className="text-slate-600 mt-1">查看 One-Coin AI 的数据概览</p>
       </div>
 
       {/* Overview cards */}

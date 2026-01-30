@@ -48,10 +48,10 @@ export default function Footer() {
               <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-600 rounded-xl flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">Atlas AI</span>
+              <span className="text-xl font-bold">One-Coin AI</span>
             </a>
             <p className="text-slate-400 mb-6 max-w-sm">
-              发现、探索、体验最新的人工智能工具和技术。Atlas AI 是您了解AI世界的最佳窗口。
+              某科学的AI目录，发现、探索、体验最新的人工智能工具和技术。
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social) => (
@@ -136,7 +136,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
             <p className="text-slate-500 text-sm">
-              © 2025 Atlas AI. All rights reserved.
+              © 2025 One-Coin AI. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
               {footerLinks.legal.map((link) => (

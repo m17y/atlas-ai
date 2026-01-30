@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-lg">Atlas AI</span>
+            <span className="font-bold text-lg">One-Coin AI</span>
           </Link>
           <button
             className="lg:hidden p-2 hover:bg-slate-800 rounded-lg"
