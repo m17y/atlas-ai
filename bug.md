@@ -1,7 +1,22 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-
+1. http://127.0.0.1:3000/trending
+Error: 
+  × You are attempting to export "metadata" from a component marked with "use client", which is disallowed. Either remove the export, or the "use client" directive. Read more: https://nextjs.org/
+  │ docs/getting-started/react-essentials#the-use-client-directive
+  │ 
+  │ 
+    ╭─[/Users/syf/Documents/trae_projects/atlas-ai/src/app/trending/page.tsx:7:1]
+  7 │ import { TrendingUp, TrendingDown, Flame, Star } from 'lucide-react'
+  8 │ import Link from 'next/link'
+  9 │ 
+ 10 │ export const metadata: Metadata = {
+    ·              ────────
+ 11 │   title: '排行榜 - Atlas AI',
+ 12 │   description: '查看最热门的人工智能工具排行榜',
+ 13 │ }
+    ╰────
 ---
 
 ## 历史修复记录
