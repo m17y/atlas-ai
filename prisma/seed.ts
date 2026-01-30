@@ -71,7 +71,7 @@ async function main() {
     prisma.category.create({
       data: {
         id: 'cat_chatbot',
-        name: 'AI 对话',
+        name: '文本对话',
         description: 'AI 聊天机器人和对话工具',
         icon: 'message-circle',
         count: 0,

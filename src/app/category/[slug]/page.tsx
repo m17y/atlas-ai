@@ -1,77 +1,64 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import type { Metadata } from 'next'
 import { Tool, Category } from '@/lib/api'
 import { getIconEmoji, getCategoryColor } from '@/lib/icons'
 import Link from 'next/link'
 
-export default function CategoryPage() {
-  const params = useParams()
-  const [tools, setTools] = useState<Tool[]>([])
-  const [category, setCategory] = useState<Category | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [categories, setCategories] = useState<Category[]>([])
+export async function generateStaticParams() {
+  return [
+    { slug: '图像生成' },
+    { slug: '代码生成' },
+    { slug: '内容写作' },
+    { slug: '视频生成' },
+    { slug: '语音合成' },
+    { slug: 'AI 搜索' },
+    { slug: '生产力工具' },
+    { slug: '文本对话' },
+  ]
+}
 
-  const categorySlug = params?.slug as string
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // 获取所有分类找到当前分类
-        const categoriesResponse = await fetch('/api/categories')
-        const categoriesData = await fetch('/api/categories').then(res => res.json())
-        setCategories(categoriesData)
-
-        // 找到匹配的分类
-        const foundCategory = categoriesData.find((cat: Category) => 
-          cat.name === categorySlug || cat.id === categorySlug
-        )
-        setCategory(foundCategory || null)
-
-        // 获取该分类的工具
-        if (foundCategory) {
-          const toolsResponse = await fetch(`/api/tools?category=${foundCategory.id}`)
-          const toolsData = await toolsResponse.json()
-          setTools(toolsData.tools)
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [categorySlug])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="animate-pulse">
-            <div className="h-8 bg-slate-200 rounded w-48 mb-4" />
-            <div className="h-4 bg-slate-200 rounded w-24 mb-8" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="card">
-                  <div className="h-48 bg-slate-200" />
-                  <div className="p-5">
-                    <div className="h-6 bg-slate-200 rounded mb-3" />
-                    <div className="h-4 bg-slate-200 rounded mb-4" />
-                    <div className="flex gap-1.5">
-                      <div className="h-5 w-16 bg-slate-200 rounded-full" />
-                      <div className="h-5 w-16 bg-slate-200 rounded-full" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  return {
+    title: `${slug} - Atlas AI`,
+    description: `浏览最新的 ${slug} 类人工智能工具`,
   }
+}
+
+async function getCategoryData(slug: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+  
+  try {
+    const [categoriesRes, toolsRes] = await Promise.all([
+      fetch(`${baseUrl}/api/categories`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/tools`, { cache: 'no-store' }),
+    ])
+
+    const categories: Category[] = await categoriesRes.json()
+    const toolsData = await toolsRes.json()
+    const tools: Tool[] = toolsData.tools
+
+    const foundCategory = categories.find((cat: Category) => 
+      cat.name === slug || cat.id === slug
+    )
+
+    const categoryTools = foundCategory 
+      ? tools.filter((tool: Tool) => tool.categoryId === foundCategory.id)
+      : []
+
+    return {
+      category: foundCategory,
+      tools: categoryTools,
+      allCategories: categories,
+    }
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+    return { category: null, tools: [], allCategories: [] }
+  }
+}
+
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const { category, tools, allCategories } = await getCategoryData(slug)
 
   if (!category) {
     return (
@@ -174,7 +161,7 @@ export default function CategoryPage() {
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">其他分类</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {categories.filter(c => c.id !== category.id).map((cat) => (
+            {allCategories.filter(c => c.id !== category.id).map((cat) => (
               <Link
                 key={cat.id}
                 href={`/category/${cat.name}`}
