@@ -11,133 +11,44 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export async function generateStaticParams() {
-  const tools = await prisma.tool.findMany({
-    select: { id: true },
-    take: 50,
-  })
-  
-  return tools.map((tool: { id: string }) => ({
-    id: tool.id,
-  }))
+async function getToolData(id: string) {
+  try {
+    const tool = await prisma.tool.findUnique({
+      where: { id },
+      include: { category: true },
+    })
+    return tool
+  } catch (error) {
+    console.error('Failed to fetch tool:', error)
+    return null
+  }
 }
 
-const toolData = {
-  id: 1,
-  name: 'ChatGPT',
-  description: 'OpenAI 推出的对话式AI助手，能够进行自然语言对话、写作、编程等多种任务。作为最受欢迎的AI对话工具之一，ChatGPT 基于强大的 GPT-4 模型，可以帮助你完成各种复杂的工作。',
-  icon: '🤖',
-  tags: ['对话AI', '写作', '编程', '文本生成', 'AI助手'],
-  rating: 4.9,
-  reviewCount: 12500,
-  category: '文本对话',
-  website: 'https://chat.openai.com',
-  pricing: '免费 / 付费版 $20/月',
-  releaseDate: '2022年11月',
-  company: 'OpenAI',
-  platform: 'Web, iOS, Android, API',
+export default async function ToolPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const tool = await getToolData(id)
 
-  // Stats
-  todayVisits: '12,456',
-  weeklyDownloads: '89,234',
-  favorites: '23,456',
+  if (!tool) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">404</h1>
+          <p className="text-slate-600">工具不存在</p>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
-  // Features
-  features: [
-    { title: '智能对话', description: '支持自然语言对话，可以理解复杂的语境和指令' },
-    { title: '多语言支持', description: '支持中文、英文、日文等多种语言的对话和写作' },
-    { title: '代码编写', description: '可以帮助编写、调试和解释各种编程语言的代码' },
-    { title: '文档写作', description: '支持撰写文章、邮件、报告等多种类型的文档' },
-    { title: '创意生成', description: '可以生成创意内容，包括故事、诗歌、营销文案等' },
-    { title: 'API集成', description: '提供API接口，可以集成到自己的应用中使用' }
-  ],
+  const pricingText = tool.pricing === 'free' 
+    ? '免费' 
+    : tool.pricing === 'paid' 
+    ? '付费' 
+    : '免费增值'
 
-  // Pricing Plans
-  pricingPlans: [
-    {
-      name: '免费版',
-      price: '免费',
-      features: ['基础对话功能', 'GPT-3.5模型', '标准响应速度', '有限的使用次数'],
-      popular: false
-    },
-    {
-      name: 'Plus',
-      price: '$20/月',
-      features: ['GPT-4模型', '更快的响应速度', '无限使用次数', '优先访问新功能'],
-      popular: true
-    },
-    {
-      name: 'Team',
-      price: '$25/月/人',
-      features: ['GPT-4模型', '团队协作功能', '管理后台', '更高的使用限制'],
-      popular: false
-    }
-  ],
-
-  // Use Cases
-  useCases: [
-    {
-      title: '代码开发',
-      description: '帮助开发者编写、调试和优化代码',
-      image: '💻'
-    },
-    {
-      title: '内容创作',
-      description: '撰写文章、博客、营销文案等各类内容',
-      image: '✍️'
-    },
-    {
-      title: '学习助手',
-      description: '解答问题、解释概念、辅助学习',
-      image: '📚'
-    },
-    {
-      title: '商务沟通',
-      description: '撰写邮件、报告、商务提案等',
-      image: '💼'
-    }
-  ],
-
-  // Reviews
-  reviews: [
-    {
-      user: '技术开发者',
-      avatar: '👨‍💻',
-      rating: 5,
-      date: '2025-01-15',
-      content: 'ChatGPT 彻底改变了我的开发工作流程。它帮我节省了大量编写样板代码的时间，而且对复杂问题的解释非常清晰。',
-      helpful: 128
-    },
-    {
-      user: '内容创作者',
-      avatar: '👩‍🎨',
-      rating: 5,
-      date: '2025-01-12',
-      content: '作为一个内容创作者，ChatGPT 是我的得力助手。它帮我快速生成创意、润色文案，极大提高了工作效率。',
-      helpful: 89
-    },
-    {
-      user: '学生用户',
-      avatar: '👨‍🎓',
-      rating: 4,
-      date: '2025-01-10',
-      content: '学习过程中的好帮手！用它来理解复杂的概念和解答作业问题非常有效。不过要注意培养独立思考能力。',
-      helpful: 56
-    }
-  ],
-
-  // Related Tools
-  relatedTools: [
-    { name: 'Claude', icon: '🧠', rating: 4.9 },
-    { name: 'Gemini', icon: '💎', rating: 4.8 },
-    { name: 'Perplexity', icon: '🔍', rating: 4.7 },
-    { name: 'Mistral', icon: '🌪️', rating: 4.6 }
-  ]
-}
-
-export default function ToolPage({ params }: { params: { id: string } }) {
   return (
-    <main className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <Header />
 
       {/* Breadcrumb */}
@@ -148,282 +59,258 @@ export default function ToolPage({ params }: { params: { id: string } }) {
             <span className="mx-2 text-slate-400">/</span>
             <a href="/categories" className="text-slate-500 hover:text-primary-600">分类</a>
             <span className="mx-2 text-slate-400">/</span>
-            <span className="text-slate-900">{toolData.name}</span>
+            <a href={`/category/${tool.category?.name}`} className="text-slate-500 hover:text-primary-600">{tool.category?.name}</a>
+            <span className="mx-2 text-slate-400">/</span>
+            <span className="text-slate-900">{tool.name}</span>
           </nav>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Icon & Basic Info */}
-            <div className="flex items-start space-x-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-purple-100 rounded-2xl flex items-center justify-center text-7xl">
-                {toolData.icon}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Tool Info Card */}
+            <div className="card overflow-hidden">
+              <div className="h-64 bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
+                <span className="text-8xl">{tool.icon}</span>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">{toolData.name}</h1>
-                <p className="text-slate-600 mb-4">{toolData.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {toolData.tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <h1 className="text-3xl font-bold text-slate-900 mb-2">{tool.name}</h1>
+                    <p className="text-slate-600">{tool.description}</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button className="p-3 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
+                      <Heart className="w-5 h-5" />
+                    </button>
+                    <button className="p-3 rounded-xl bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors">
+                      <Share2 className="w-5 h-5" />
+                    </button>
+                    <a 
+                      href={tool.website || '#'} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn-primary flex items-center space-x-2"
+                    >
+                      <ExternalLink className="w-5 h-5" />
+                      <span>访问官网</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {tool.tags.map((tag: string) => (
+                    <span 
+                      key={tag}
+                      className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm"
+                    >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-slate-500">
-                  <span className="flex items-center">
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 mr-1" />
-                    {toolData.rating} ({toolData.reviewCount.toLocaleString()} 条评价)
-                  </span>
-                  <span>{toolData.category}</span>
+
+                <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+                    <span className="text-2xl font-bold text-slate-900">{tool.rating.toFixed(1)}</span>
+                    <span className="text-slate-500">({tool.reviewCount.toLocaleString()} 条评价)</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                      tool.pricing === 'free' ? 'bg-green-100 text-green-700' :
+                      tool.pricing === 'paid' ? 'bg-red-100 text-red-700' :
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {pricingText}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex-1 flex flex-col items-end space-y-3">
-              <div className="flex space-x-3">
-                <button className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 transition-colors">
-                  <Heart className="w-5 h-5" />
-                </button>
-                <button className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-primary-600 hover:border-primary-200 transition-colors">
-                  <Share2 className="w-5 h-5" />
-                </button>
-              </div>
-              <a
-                href={toolData.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary flex items-center space-x-2"
-              >
-                <span>访问官网</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 mt-8 pt-8 border-t border-slate-100">
-            <div className="text-center">
-              <div className="flex items-center justify-center text-slate-400 mb-2">
-                <Eye className="w-5 h-5 mr-2" />
-                <span className="text-sm">今日访问</span>
-              </div>
-              <div className="text-2xl font-bold text-slate-900">{toolData.todayVisits}</div>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center text-slate-400 mb-2">
-                <Download className="w-5 h-5 mr-2" />
-                <span className="text-sm">本周下载</span>
-              </div>
-              <div className="text-2xl font-bold text-slate-900">{toolData.weeklyDownloads}</div>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center text-slate-400 mb-2">
-                <Heart className="w-5 h-5 mr-2" />
-                <span className="text-sm">收藏数量</span>
-              </div>
-              <div className="text-2xl font-bold text-slate-900">{toolData.favorites}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-white rounded-xl p-1 shadow-md mb-8 overflow-x-auto">
-          {['概览', '功能特性', '定价方案', '使用案例', '用户评价', '相关推荐'].map((tab, index) => (
-            <button
-              key={tab}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap ${
-                index === 0
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Features */}
-            <div className="bg-white rounded-2xl shadow-md p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">功能特性</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                {toolData.features.map((feature, index) => (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Check className="w-5 h-5 text-primary-600" />
-                    </div>
+            {/* Features Section */}
+            <div className="card p-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-6">主要功能</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { icon: '💬', title: '智能对话', desc: '支持自然语言交互' },
+                  { icon: '📝', title: '内容生成', desc: '快速生成高质量内容' },
+                  { icon: '💻', title: '代码辅助', desc: '智能编程建议和补全' },
+                  { icon: '🌍', title: '多语言支持', desc: '支持多种语言交流' },
+                  { icon: '⚡', title: '快速响应', desc: '实时生成结果' },
+                  { icon: '🔒', title: '安全隐私', desc: '保护用户数据安全' },
+                ].map((feature) => (
+                  <div key={feature.title} className="flex items-start space-x-4 p-4 bg-slate-50 rounded-xl">
+                    <span className="text-2xl">{feature.icon}</span>
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-1">{feature.title}</h3>
-                      <p className="text-sm text-slate-600">{feature.description}</p>
+                      <h3 className="font-medium text-slate-900">{feature.title}</h3>
+                      <p className="text-sm text-slate-500">{feature.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Pricing */}
-            <div className="bg-white rounded-2xl shadow-md p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">定价方案</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                {toolData.pricingPlans.map((plan, index) => (
-                  <div
-                    key={index}
-                    className={`relative bg-slate-50 rounded-2xl p-6 ${
-                      plan.popular ? 'border-2 border-primary-500' : ''
-                    }`}
-                  >
-                    {plan.popular && (
-                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span className="bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-                          最受欢迎
-                        </span>
-                      </div>
-                    )}
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                    <div className="text-3xl font-bold text-primary-600 mb-6">
-                      {plan.price}
-                    </div>
-                    <ul className="space-y-3">
-                      {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-center text-sm text-slate-600">
-                          <Check className="w-4 h-4 text-green-500 mr-2" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <button className={`w-full mt-6 py-3 rounded-lg font-medium transition-colors ${
-                      plan.popular
-                        ? 'bg-primary-600 text-white hover:bg-primary-700'
-                        : 'bg-white border-2 border-primary-600 text-primary-600 hover:bg-primary-50'
-                    }`}>
-                      选择方案
-                    </button>
+            {/* Pricing Section */}
+            <div className="card p-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-6">定价方案</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 border border-slate-200 rounded-2xl">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">免费版</h3>
+                  <p className="text-3xl font-bold text-slate-900 mb-4">¥0<span className="text-sm font-normal text-slate-500">/月</span></p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      基础功能
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      有限使用次数
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      标准响应速度
+                    </li>
+                  </ul>
+                  <button className="w-full py-3 border border-primary-600 text-primary-600 rounded-xl font-medium hover:bg-primary-50 transition-colors">
+                    免费使用
+                  </button>
+                </div>
+                
+                <div className="p-6 border-2 border-primary-500 rounded-2xl relative">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 bg-primary-500 text-white rounded-full text-sm font-medium">
+                    推荐
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Use Cases */}
-            <div className="bg-white rounded-2xl shadow-md p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">使用案例</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                {toolData.useCases.map((useCase, index) => (
-                  <div key={index} className="bg-slate-50 rounded-xl p-6 hover:shadow-md transition-shadow">
-                    <span className="text-4xl mb-4 block">{useCase.image}</span>
-                    <h3 className="font-bold text-slate-900 mb-2">{useCase.title}</h3>
-                    <p className="text-sm text-slate-600">{useCase.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Reviews */}
-            <div className="bg-white rounded-2xl shadow-md p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-900">用户评价</h2>
-                <button className="text-primary-600 hover:text-primary-700 font-medium">
-                  查看全部 {toolData.reviewCount.toLocaleString()} 条评价
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                {toolData.reviews.map((review: any, index: number) => (
-                  <div key={index} className="border-b border-slate-100 last:border-0 pb-6 last:pb-0">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <span className="text-3xl">{review.avatar}</span>
-                      <div>
-                        <div className="font-medium text-slate-900">{review.user}</div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-4 h-4 ${
-                                  star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-slate-200'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm text-slate-400">{review.date}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-slate-600 mb-4">{review.content}</p>
-                    <div className="flex items-center space-x-4">
-                      <button className="flex items-center space-x-1 text-sm text-slate-400 hover:text-primary-600 transition-colors">
-                        <span>有帮助</span>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded-full">{review.helpful}</span>
-                      </button>
-                      <button className="flex items-center space-x-1 text-sm text-slate-400 hover:text-primary-600 transition-colors">
-                        <MessageSquare className="w-4 h-4" />
-                        <span>评论</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">专业版</h3>
+                  <p className="text-3xl font-bold text-slate-900 mb-4">¥99<span className="text-sm font-normal text-slate-500">/月</span></p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      全部功能
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      无限使用次数
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      优先响应速度
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      高级支持
+                    </li>
+                  </ul>
+                  <button className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors">
+                    立即升级
+                  </button>
+                </div>
+                
+                <div className="p-6 border border-slate-200 rounded-2xl">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">企业版</h3>
+                  <p className="text-3xl font-bold text-slate-900 mb-4">定制</p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      专属定制
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      私有化部署
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      24/7 支持
+                    </li>
+                    <li className="flex items-center text-slate-600">
+                      <Check className="w-5 h-5 text-green-500 mr-2" />
+                      SLA 保障
+                    </li>
+                  </ul>
+                  <button className="w-full py-3 border border-slate-300 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors">
+                    联系销售
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Info Card */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="font-bold text-slate-900 mb-4">基本信息</h3>
+            {/* Stats Card */}
+            <div className="card p-6">
+              <h3 className="font-semibold text-slate-900 mb-4">数据统计</h3>
               <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">发布者</span>
-                  <span className="font-medium text-slate-900">{toolData.company}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">今日访问</span>
+                  <span className="font-semibold text-slate-900">12,456</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">发布时间</span>
-                  <span className="font-medium text-slate-900">{toolData.releaseDate}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">本周下载</span>
+                  <span className="font-semibold text-slate-900">89,234</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">平台</span>
-                  <span className="font-medium text-slate-900">{toolData.platform}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">收藏人数</span>
+                  <span className="font-semibold text-slate-900">23,456</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">定价</span>
-                  <span className="font-medium text-slate-900">{toolData.pricing}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600">用户评分</span>
+                  <span className="font-semibold text-slate-900">4.9/5.0</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Info Card */}
+            <div className="card p-6">
+              <h3 className="font-semibold text-slate-900 mb-4">工具信息</h3>
+              <div className="space-y-4">
+                <div>
+                  <span className="text-slate-500 text-sm">分类</span>
+                  <p className="font-medium text-slate-900">{tool.category?.name}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500 text-sm">定价模式</span>
+                  <p className="font-medium text-slate-900">{pricingText}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500 text-sm">发布时间</span>
+                  <p className="font-medium text-slate-900">2024年1月</p>
+                </div>
+                <div>
+                  <span className="text-slate-500 text-sm">开发商</span>
+                  <p className="font-medium text-slate-900">OpenAI</p>
+                </div>
+                <div>
+                  <span className="text-slate-500 text-sm">平台支持</span>
+                  <p className="font-medium text-slate-900">Web, iOS, Android, API</p>
                 </div>
               </div>
             </div>
 
             {/* Related Tools */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="font-bold text-slate-900 mb-4">相似工具</h3>
+            <div className="card p-6">
+              <h3 className="font-semibold text-slate-900 mb-4">相关工具</h3>
               <div className="space-y-4">
-                {toolData.relatedTools.map((tool, index) => (
-                  <a key={index} href={`/tool/${index + 2}`} className="flex items-center space-x-4 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                    <span className="text-2xl">{tool.icon}</span>
+                {[
+                  { name: 'Claude', icon: '🧠', rating: 4.9 },
+                  { name: 'Gemini', icon: '✨', rating: 4.8 },
+                  { name: 'Perplexity', icon: '🔍', rating: 4.7 },
+                ].map((relatedTool) => (
+                  <a 
+                    key={relatedTool.name}
+                    href="#" 
+                    className="flex items-center space-x-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <span className="text-2xl">{relatedTool.icon}</span>
                     <div className="flex-1">
-                      <div className="font-medium text-slate-900">{tool.name}</div>
-                      <div className="flex items-center text-sm text-slate-400">
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
-                        {tool.rating}
+                      <h4 className="font-medium text-slate-900">{relatedTool.name}</h4>
+                      <div className="flex items-center text-sm text-slate-500">
+                        <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                        {relatedTool.rating}
                       </div>
                     </div>
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Browse History */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="font-bold text-slate-900 mb-4">浏览历史</h3>
-              <div className="space-y-3">
-                {['Claude', 'Midjourney', 'GitHub Copilot'].map((name, index) => (
-                  <a key={index} href="#" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                    <span className="text-xl">→</span>
-                    <span className="text-slate-600 hover:text-primary-600">{name}</span>
                   </a>
                 ))}
               </div>
@@ -433,6 +320,6 @@ export default function ToolPage({ params }: { params: { id: string } }) {
       </div>
 
       <Footer />
-    </main>
+    </div>
   )
 }

@@ -3,19 +3,6 @@ import { Tool, Category } from '@/lib/api'
 import { getIconEmoji, getCategoryColor } from '@/lib/icons'
 import Link from 'next/link'
 
-export async function generateStaticParams() {
-  return [
-    { slug: '图像生成' },
-    { slug: '代码生成' },
-    { slug: '内容写作' },
-    { slug: '视频生成' },
-    { slug: '语音合成' },
-    { slug: 'AI 搜索' },
-    { slug: '生产力工具' },
-    { slug: '文本对话' },
-  ]
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   return {
@@ -76,7 +63,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero Section */}
       <div className={`bg-gradient-to-br ${getCategoryColor(category.name)} py-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-4 mb-4">
@@ -90,7 +76,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
 
-      {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <nav className="text-sm text-slate-500">
           <Link href="/" className="hover:text-primary-600">首页</Link>
@@ -101,7 +86,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </nav>
       </div>
 
-      {/* Tools Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {tools.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -157,7 +141,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           </div>
         )}
 
-        {/* Other Categories */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">其他分类</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
