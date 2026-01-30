@@ -27,6 +27,7 @@ export default function Header() {
             <Link href="/categories" className="text-slate-600 hover:text-primary-600 transition-colors">分类</Link>
             <Link href="/trending" className="text-slate-600 hover:text-primary-600 transition-colors">排行榜</Link>
             <Link href="/insights" className="text-slate-600 hover:text-primary-600 transition-colors">趋势</Link>
+            <Link href="/preview" className="text-slate-600 hover:text-primary-600 transition-colors">预览</Link>
           </nav>
 
           {/* Search Bar */}
@@ -78,6 +79,7 @@ export default function Header() {
               <Link href="/categories" className="text-slate-600 py-2">分类</Link>
               <Link href="/trending" className="text-slate-600 py-2">排行榜</Link>
               <Link href="/insights" className="text-slate-600 py-2">趋势</Link>
+              <Link href="/preview" className="text-slate-600 py-2">预览</Link>
               <div className="pt-4 border-t border-slate-200">
                 <Link href="/login" className="text-slate-600 py-2 block">登录</Link>
                 <Link href="/register" className="text-primary-600 py-2 block font-medium">注册</Link>
