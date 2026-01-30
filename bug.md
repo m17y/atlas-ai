@@ -1,8 +1,7 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-1. http://127.0.0.1:3000/news/2 404 设计新闻页面
-2. http://127.0.0.1:3000/admin/login 管理界面，账号密码，可以在配置文件中设置，默认admin password
+
 ---
 
 ## 历史修复记录
@@ -11,9 +10,10 @@
 
 ### 2025-02-01
 
-**本次修复包含 1 项改进**
+**本次修复包含 2 项改进**
 
-1. ✅ **Trending 页面 metadata 导出错误** - 创建 TrendingClient.tsx 分离客户端交互，page.tsx 改为服务器组件从数据库获取数据
+1. ✅ **新闻详情页面** - 创建 `/news/[id]` 动态路由，展示新闻详细内容
+2. ✅ **Admin 登录功能** - 实现配置文件认证，默认账号: admin / password
 
 ---
 
@@ -71,8 +71,22 @@
 | 分类页 | http://localhost:3000/categories |
 | 排行榜 | http://localhost:3000/trending |
 | 社区 | http://localhost:3000/community |
+| 新闻列表 | http://localhost:3000/news |
+| 新闻详情 | http://localhost:3000/news/1 |
 | 教程详情 | http://localhost:3000/tutorials/chatgpt-starter |
 | 工具详情 | http://localhost:3000/tool/tool_chatgpt |
+| 管理员登录 | http://localhost:3000/admin/login |
+
+---
+
+## Admin 登录配置
+
+| 配置项 | 环境变量 | 默认值 |
+|--------|----------|--------|
+| 用户名 | `ADMIN_USERNAME` | `admin` |
+| 密码 | `ADMIN_PASSWORD` | `password` |
+
+**配置文件**: `.env`
 
 ---
 
