@@ -43,10 +43,14 @@ export default function AdminTutorialsPage() {
   async function fetchTutorials() {
     try {
       const res = await fetch('/api/tutorials')
+      if (!res.ok) {
+        throw new Error('Failed to fetch tutorials')
+      }
       const data = await res.json()
-      setTutorials(data)
+      setTutorials(Array.isArray(data.tutorials) ? data.tutorials : [])
     } catch (error) {
       console.error('Failed to fetch tutorials:', error)
+      setTutorials([])
     } finally {
       setLoading(false)
     }
