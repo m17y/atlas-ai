@@ -1,95 +1,37 @@
 # Bug 修复清单
 
-> **重要提示**：详细的修复记录保存在 `.bug-records/` 目录下，包含完整的问题分析、修复方案和涉及文件。
-> 
-> **快速修复**：直接提供 bug.md 给 AI，AI 会根据以下格式快速理解问题并修复。
+> **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
 
 ---
 
-## 本次修复
+## 历史修复记录
 
-### 1. ✅ Categories 页面分类点击交互优化
+按时间线排序，简要总结每个修复周期。
 
-**问题**：`http://127.0.0.1:3000/categories` 页面点击分类时跳转新页面
+### 2025-01-30
 
-**修复**：改为在当前页面过滤展示工具列表
+**本次修复包含 6 项改进**：[详细记录](./.bug-records/2025-01-30.md)
 
-**主要改动**：
-- 使用 React state 管理选中分类状态
-- 分类按钮点击不跳转，直接过滤显示
-- 添加搜索、排序、视图切换功能
-- 添加清除筛选功能
-
-**文件**：`src/app/categories/page.tsx`
-
----
-
-### 2. ✅ 恢复导航入口
-
-**问题**：`/trending` 和 `/insights` 页面没有导航入口
-
-**修复**：在 Header 导航栏添加链接
-
-**文件**：`src/components/Header.tsx`
+1. ✅ **Categories 页面分类点击交互优化** - 改为当前页面过滤展示工具
+2. ✅ **恢复导航入口** - 添加 trending 和 insights 导航链接
+3. ✅ **教程系统** - 创建完整教程系统（数据库、API、页面、示例数据）
+4. ✅ **社区页面 GitHub 集成** - 调用 GitHub Issues API 获取真实讨论
+5. ✅ **CONTRIBUTING.md** - 创建贡献指南
+6. ✅ **Bug 记录系统** - 创建 `.bug-records/` 文件夹和索引
 
 ---
 
-### 3. ✅ 教程系统
+### 2025-01-29
 
-**问题**：`http://127.0.0.1:3000/tutorials/chatgpt-starter` 404
+**本次修复包含 7 项改进**
 
-**修复**：创建完整的教程系统
-
-**主要改动**：
-- 数据库模型：`Tutorial` 和 `TutorialChapter`
-- API 路由：`/api/tutorials`、`/api/tutorials/[slug]`、`/api/tutorials/chapters`
-- 页面：`/tutorials`、`/tutorials/[slug]`、`/admin/tutorials`、`/admin/tutorials/new`
-- 示例数据：5个教程
-
----
-
-### 4. ✅ 社区页面使用 GitHub Issues 数据
-
-**问题**：【热门讨论】显示静态数据
-
-**修复**：调用 GitHub API 获取真实 Issues 数据
-
-**主要改动**：
-- 创建 `/api/discussions` API 路由
-- 使用 `https://api.github.com/repos/m17y/atlas-ai/issues` API
-- 更新社区页面展示真实讨论
-
-**文件**：
-- `src/app/api/discussions/route.ts`
-- `src/app/community/page.tsx`
-
----
-
-### 5. ✅ 创建 CONTRIBUTING.md
-
-**问题**：项目缺少贡献指南
-
-**修复**：创建 CONTRIBUTING.md 文件
-
-**内容**：
-- 贡献方式说明
-- 项目结构介绍
-- 提交规范
-- 添加新工具/教程指南
-- PR 流程
-
----
-
-## 历史修复
-
-| # | 状态 | 问题描述 |
-|---|------|---------|
-| 1 | ✅ | `http://localhost:3000/category/文本对话` 分类详情正常工作 |
-| 2 | ✅ | `http://localhost:3000/category/AI代理` 分类详情正常工作 |
-| 3 | ✅ | 首页搜索框功能 - 跳转到分类页过滤结果 |
-| 4 | ✅ | `http://localhost:3000/admin/login` 登录页正常工作 |
-| 5 | ✅ | `http://localhost:3000/tool/1` 工具详情使用正确ID |
-| 6 | ✅ | 首页新增功能链接（AI新闻、教程、API文档、开源项目、社区）|
+1. ✅ **分类详情页 404** - 分类页面正常工作
+2. ✅ **搜索框功能** - 首页搜索跳转到分类页过滤
+3. ✅ **admin/login 404** - 创建独立登录页面
+4. ✅ **工具详情 404** - 修复工具 ID 匹配问题
+5. ✅ **categories 页面报错** - 修复 tool.category 对象渲染问题
+6. ✅ **新页面** - AI新闻、教程、API文档、开源项目、社区
+7. ✅ **导航链接** - 新增页面链接到 Header
 
 ---
 
@@ -132,7 +74,7 @@
 ```
 请修复 bug.md 中记录的问题。
 当前 bug.md 内容：[粘贴 bug.md]
-相关记录文件：.bug-records/2025-01-30.md
+相关记录文件：.bug-records/YYYY-MM-DD.md
 新问题描述：[新 bug 的描述]
 ```
 
@@ -147,7 +89,7 @@
 
 ## 记录规范
 
-1. **bug.md**：只记录修复摘要，保持简洁
-2. **.bug-records/**：记录详细分析，包含完整上下文
+1. **bug.md**：只记录简要总结，按时间线排序，详细内容链接到 `.bug-records/`
+2. **`.bug-records/`**：详细分析文档，每个日期一个文件
 3. **不要修改历史记录文件**，保持原貌
-4. 新记录以日期命名：`YYYY-MM-DD.md`
+4. 新记录以日期命名：`.bug-records/YYYY-MM-DD.md`
