@@ -9,122 +9,57 @@ export const metadata: Metadata = {
   description: '按类别浏览最新的人工智能工具和技术',
 }
 
-const categories = [
-  { name: '全部', count: 2000, active: true },
-  { name: '文本对话', count: 450, active: false },
-  { name: '图像生成', count: 380, active: false },
-  { name: '视频生成', count: 220, active: false },
-  { name: '音频处理', count: 180, active: false },
-  { name: '代码辅助', count: 320, active: false },
-  { name: '数据分析', count: 200, active: false },
-  { name: 'AI代理', count: 280, active: false },
-  { name: '自动化', count: 240, active: false },
-  { name: '研究工具', count: 160, active: false },
-  { name: '多模态', count: 190, active: false },
-  { name: '移动应用', count: 350, active: false },
-  { name: '安全合规', count: 120, active: false }
-]
+interface Category {
+  id: string
+  name: string
+  description: string
+  icon: string
+  count: number
+}
 
-const tools = [
-  {
-    id: 1,
-    name: 'ChatGPT',
-    description: 'OpenAI 推出的对话式AI助手，能够进行自然语言对话、写作、编程等多种任务',
-    icon: '🤖',
-    tags: ['对话AI', '写作', '编程'],
-    rating: 4.9,
-    reviews: 12500,
-    category: '文本对话',
-    isFree: false,
-    price: '$20/月'
-  },
-  {
-    id: 2,
-    name: 'Midjourney',
-    description: '强大的AI图像生成工具，支持多种艺术风格，快速生成高质量图片',
-    icon: '🎨',
-    tags: ['图像生成', '艺术创作', '设计'],
-    rating: 4.8,
-    reviews: 8900,
-    category: '图像生成',
-    isFree: false,
-    price: '$10/月'
-  },
-  {
-    id: 3,
-    name: 'Claude',
-    description: 'Anthropic开发的AI助手，专注于安全、有帮助的对话和任务处理',
-    icon: '🧠',
-    tags: ['对话AI', '分析', '写作'],
-    rating: 4.9,
-    reviews: 7600,
-    category: '文本对话',
-    isFree: true,
-    price: '免费'
-  },
-  {
-    id: 4,
-    name: 'GitHub Copilot',
-    description: 'AI驱动的代码助手，帮助开发者更快更好地编写代码',
-    icon: '💻',
-    tags: ['代码辅助', '编程', '开发工具'],
-    rating: 4.7,
-    reviews: 11200,
-    category: '代码辅助',
-    isFree: false,
-    price: '$10/月'
-  },
-  {
-    id: 5,
-    name: 'Stable Diffusion',
-    description: '开源的AI图像生成模型，支持本地部署和自定义训练',
-    icon: '🖼️',
-    tags: ['图像生成', '开源', 'AI模型'],
-    rating: 4.8,
-    reviews: 9800,
-    category: '图像生成',
-    isFree: true,
-    price: '免费'
-  },
-  {
-    id: 6,
-    name: 'Runway',
-    description: 'AI视频生成和编辑平台，支持文本到视频、图像生成等多种功能',
-    icon: '🎬',
-    tags: ['视频生成', '视频编辑', '创意'],
-    rating: 4.7,
-    reviews: 5400,
-    category: '视频生成',
-    isFree: false,
-    price: '$12/月'
-  },
-  {
-    id: 7,
-    name: 'Notion AI',
-    description: '集成在Notion中的AI助手，帮助提升文档写作和项目管理效率',
-    icon: '📝',
-    tags: ['写作辅助', '文档', '项目管理'],
-    rating: 4.6,
-    reviews: 6700,
-    category: '文本对话',
-    isFree: false,
-    price: '$10/月'
-  },
-  {
-    id: 8,
-    name: 'Gamma',
-    description: 'AI驱动的演示文稿制作工具，快速生成专业的PPT和幻灯片',
-    icon: '📊',
-    tags: ['演示文稿', 'AI工具', '设计'],
-    rating: 4.8,
-    reviews: 4300,
-    category: '自动化',
-    isFree: false,
-    price: '$15/月'
+interface Tool {
+  id: string
+  name: string
+  description: string
+  icon: string
+  tags: string[]
+  rating: number
+  reviews: number
+  category: string
+  isFree: boolean
+  price: string
+}
+
+async function getData() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+  
+  try {
+    const [categoriesRes, toolsRes] = await Promise.all([
+      fetch(`${baseUrl}/api/categories`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/tools`, { cache: 'no-store' }),
+    ])
+
+    const categories: Category[] = await categoriesRes.json()
+    const toolsData = await toolsRes.json()
+    const tools: Tool[] = toolsData.tools
+
+    return { categories, tools }
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+    return { categories: [], tools: [] }
   }
-]
+}
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const { categories, tools } = await getData()
+
+  // 计算每个分类的工具数量
+  const categoriesWithCounts = categories.map(category => ({
+    ...category,
+    count: category.count || 0,
+    active: false
+  }))
+
   return (
     <main className="min-h-screen bg-slate-50">
       <Header />
@@ -151,20 +86,22 @@ export default function CategoriesPage() {
               </h3>
 
               <div className="space-y-2">
-                {categories.map((category) => (
+                {/* 全部 */}
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg transition-colors bg-primary-100 text-primary-700 font-medium">
+                  <span>全部</span>
+                  <span className="text-xs text-primary-600">
+                    {tools.length}
+                  </span>
+                </div>
+
+                {categoriesWithCounts.map((category) => (
                   <Link
-                    key={category.name}
+                    key={category.id}
                     href={`/category/${category.name}`}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                      category.active
-                        ? 'bg-primary-100 text-primary-700 font-medium'
-                        : 'text-slate-600 hover:bg-slate-100'
-                    }`}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-slate-600 hover:bg-slate-100"
                   >
                     <span>{category.name}</span>
-                    <span className={`text-xs ${
-                      category.active ? 'text-primary-600' : 'text-slate-400'
-                    }`}>
+                    <span className="text-xs text-slate-400">
                       {category.count}
                     </span>
                   </Link>
@@ -243,7 +180,7 @@ export default function CategoriesPage() {
             {/* Results Count */}
             <div className="flex items-center justify-between mb-6">
               <p className="text-slate-600">
-                共找到 <span className="font-medium text-slate-900">2000</span> 个工具
+                共找到 <span className="font-medium text-slate-900">{tools.length}</span> 个工具
               </p>
             </div>
 
@@ -270,7 +207,7 @@ export default function CategoriesPage() {
                       {tool.description}
                     </p>
                     <div className="flex flex-wrap gap-1.5 mb-4">
-                      {tool.tags.map((tag) => (
+                      {tool.tags.slice(0, 3).map((tag) => (
                         <span key={tag} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs">
                           {tag}
                         </span>
@@ -279,7 +216,7 @@ export default function CategoriesPage() {
                     <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span className="text-sm font-medium text-slate-700">{tool.rating}</span>
+                        <span className="text-sm font-medium text-slate-700">{tool.rating.toFixed(1)}</span>
                         <span className="text-xs text-slate-400">({tool.reviews.toLocaleString()})</span>
                       </div>
                       <div className="flex items-center space-x-3">
