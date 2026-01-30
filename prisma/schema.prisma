@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tool {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+  pricing       String   // free, paid, freemium
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  tags          String   // JSON array stored as string
+  icon          String
+  website       String?
+  featured      Boolean  @default(false)
+  trending      Boolean  @default(false)
+  latest        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  reviews       Review[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  count       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tools       Tool[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews    Review[]
+  favorites  Favorite[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  content   String?
+  rating    Float
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  toolId    String
+  tool      Tool     @relation(fields: [toolId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  toolId    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, toolId])
+}
