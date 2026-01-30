@@ -34,34 +34,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 排除登录页面
     if (pathname === '/admin/login') {
       setLoading(false)
       return
     }
     
-    // 简单的认证检查
-    const adminAuth = localStorage.getItem('admin_auth')
-    if (adminAuth === 'true') {
+    const adminToken = document.cookie.split('; ').find(row => row.startsWith('admin_token='))
+    if (adminToken) {
       setIsAuthenticated(true)
     } else {
-      // 未登录，重定向到登录页
       router.push('/admin/login')
     }
     setLoading(false)
   }, [pathname, router])
 
-  function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    localStorage.setItem('admin_auth', 'true')
-    setIsAuthenticated(true)
-    router.push('/admin')
-  }
-
-  function handleLogout() {
-    localStorage.removeItem('admin_auth')
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' })
+    document.cookie = 'admin_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
     setIsAuthenticated(false)
-    router.push('/')
+    router.push('/admin/login')
+    router.refresh()
   }
 
   if (loading) {
@@ -75,19 +67,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  // 登录页面不渲染 layout
   if (pathname === '/admin/login') {
     return children
   }
 
-  // 未认证，渲染空（或重定向）
   if (!isAuthenticated) {
     return null
   }
 
   return (
     <div className="min-h-screen bg-slate-100">
-      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -95,7 +84,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-slate-900 text-white transform transition-transform duration-200 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
