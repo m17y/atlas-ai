@@ -1,18 +1,10 @@
 'use client'
 
 import { useState, useEffect, lazy, Suspense } from 'react'
-import type { Metadata } from 'next'
 import { Plus, Edit, Trash2, Eye, Clock, BookOpen } from 'lucide-react'
-import { PrismaClient } from '@prisma/client'
 import Link from 'next/link'
 
 const AdminLayout = lazy(() => import('../AdminLayoutWrapper'))
-
-const prisma = new PrismaClient()
-
-export const metadata: Metadata = {
-  title: '教程管理 - 管理后台',
-}
 
 interface Tutorial {
   id: string

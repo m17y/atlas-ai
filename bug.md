@@ -2,12 +2,6 @@
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
 
-✅ **2025-02-02 本次完成**：
-1. ✅ `/admin/news` 页面错位 - 修复 padding 问题
-2. ✅ 新闻编辑页面优化 - 统一使用 AdminLayoutWrapper
-3. ✅ 教程后台编辑功能 - 创建 `/admin/tutorials/[id]` 页面
-4. ✅ 生成 TODO-LIST.md - 梳理优化点
-5. ✅ 基于 TODO-LIST.md 优化代码 - 统一后台布局
 
 ---
 
@@ -15,7 +9,7 @@
 
 按时间线排序，简要总结每个修复周期。
 
-### 2025-02-02
+### 2026-01-02
 
 **本次修复包含 5 项改进**
 
@@ -24,6 +18,12 @@
 3. ✅ **教程后台编辑功能** - 创建 `/admin/tutorials/[slug]/page.tsx`，支持章节管理
 4. ✅ **后台布局统一** - 所有后台页面使用 AdminLayoutWrapper
 5. ✅ **生成 TODO-LIST.md** - 梳理后续可优化项
+
+1. ✅ `/admin/news` 页面错位 - 修复 padding 问题
+2. ✅ 新闻编辑页面优化 - 统一使用 AdminLayoutWrapper
+3. ✅ 教程后台编辑功能 - 创建 `/admin/tutorials/[id]` 页面
+4. ✅ 生成 TODO-LIST.md - 梳理优化点
+5. ✅ 基于 TODO-LIST.md 优化代码 - 统一后台布局
 
 **新增功能：**
 - 教程 Markdown 编辑器（@uiw/react-md-editor）
