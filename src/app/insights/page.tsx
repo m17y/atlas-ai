@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 import { TrendingUp, BarChart3, ArrowRight, Zap, Bot, Layers, Image, Code } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: '趋势分析 - AI Tech Hub',
+  title: '趋势分析 - Atlas AI',
   description: '了解最新的AI技术发展趋势和行业洞察',
 }
 

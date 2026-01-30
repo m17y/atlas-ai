@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 import { TrendingUp, TrendingDown, Flame, ChevronRight, Star, Eye } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: '排行榜 - AI Tech Hub',
+  title: '排行榜 - Atlas AI',
   description: '查看最热门的人工智能工具排行榜',
 }
 

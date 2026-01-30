@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 import { Filter, Search, Grid, List, Star, Heart, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: '分类浏览 - AI Tech Hub',
+  title: '分类浏览 - Atlas AI',
   description: '按类别浏览最新的人工智能工具和技术',
 }
 

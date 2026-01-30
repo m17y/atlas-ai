@@ -5,8 +5,8 @@ import { Star, Heart, Share2, ExternalLink, Check, TrendingUp, Download, Eye, Me
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   return {
-    title: 'ChatGPT - AI Tech Hub',
-    description: 'OpenAI 推出的对话式AI助手，能够进行自然语言对话、写作、编程等多种任务',
+    title: '工具详情 - Atlas AI',
+    description: '查看AI工具的详细信息、使用体验和用户评价',
   }
 }
 

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'AI Tech Hub - 发现最新的人工智能工具与技术',
-  description: 'AI Tech Hub 是一个专注于展示最新人工智能工具、框架和技术的平台。发现、探索、体验前沿的AI产品。',
+  title: 'Atlas AI - 发现最新的人工智能工具与技术',
+  description: 'Atlas AI 是一个专注于展示最新人工智能工具、框架和技术的平台。发现、探索、体验前沿的AI产品。',
   keywords: ['AI', '人工智能', 'AI工具', '机器学习', '深度学习', 'AI技术', 'ChatGPT', 'Midjourney', 'Claude'],
 }
 
