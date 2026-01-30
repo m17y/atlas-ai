@@ -34,11 +34,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 简单的认证检查 - 实际项目中应该使用更安全的认证方式
+    // 排除登录页面
+    if (pathname === '/admin/login') {
+      setLoading(false)
+      return
+    }
+    
+    // 简单的认证检查
     const adminAuth = localStorage.getItem('admin_auth')
     if (adminAuth === 'true') {
       setIsAuthenticated(true)
-    } else if (pathname !== '/admin/login') {
+    } else {
       // 未登录，重定向到登录页
       router.push('/admin/login')
     }
@@ -47,7 +53,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-    // 简单演示：任意密码都能登录
     localStorage.setItem('admin_auth', 'true')
     setIsAuthenticated(true)
     router.push('/admin')
@@ -70,51 +75,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  // 登录页面
+  // 登录页面不渲染 layout
   if (pathname === '/admin/login') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-600 via-purple-600 to-indigo-700 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-slate-900">管理后台</h1>
-              <p className="text-slate-500 mt-2">One-Coin AI</p>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">用户名</label>
-                <input
-                  type="text"
-                  placeholder="admin"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">密码</label>
-                <input
-                  type="password"
-                  placeholder="输入任意密码登录"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <button type="submit" className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors">
-                登录
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <Link href="/" className="text-primary-600 hover:text-primary-700 text-sm">
-                返回首页
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return children
   }
 
   // 未认证，渲染空（或重定向）

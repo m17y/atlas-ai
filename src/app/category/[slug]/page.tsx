@@ -5,9 +5,10 @@ import Link from 'next/link'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
+  const decodedSlug = decodeURIComponent(slug)
   return {
-    title: `${slug} - Atlas AI`,
-    description: `浏览最新的 ${slug} 类人工智能工具`,
+    title: `${decodedSlug} - Atlas AI`,
+    description: `浏览最新的 ${decodedSlug} 类人工智能工具`,
   }
 }
 
@@ -24,9 +25,20 @@ async function getCategoryData(slug: string) {
     const toolsData = await toolsRes.json()
     const tools: Tool[] = toolsData.tools
 
-    const foundCategory = categories.find((cat: Category) => 
-      cat.name === slug || cat.id === slug
-    )
+    // Decode slug and try multiple matching strategies
+    const decodedSlug = decodeURIComponent(slug)
+    
+    // Try to find category by:
+    // 1. Exact name match (including URL decoded)
+    // 2. ID match
+    // 3. Case-insensitive match
+    const foundCategory = categories.find((cat: Category) => {
+      return cat.name === decodedSlug || 
+             cat.name === slug ||
+             cat.id === decodedSlug ||
+             cat.id === slug ||
+             cat.name.toLowerCase() === decodedSlug.toLowerCase()
+    })
 
     const categoryTools = foundCategory 
       ? tools.filter((tool: Tool) => tool.categoryId === foundCategory.id)
@@ -45,6 +57,7 @@ async function getCategoryData(slug: string) {
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const decodedSlug = decodeURIComponent(slug)
   const { category, tools, allCategories } = await getCategoryData(slug)
 
   if (!category) {

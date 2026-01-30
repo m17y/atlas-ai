@@ -101,14 +101,23 @@ export default async function ToolPage({ params }: { params: Promise<{ id: strin
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {tool.tags.map((tag: string) => (
+                  {Array.isArray(tool.tags) ? tool.tags.map((tag: string) => (
                     <span 
                       key={tag}
                       className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm"
                     >
                       {tag}
                     </span>
-                  ))}
+                  )) : (
+                    tool.tags ? (tool.tags as string).split(',').map((tag: string) => (
+                      <span 
+                        key={tag.trim()}
+                        className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm"
+                      >
+                        {tag.trim()}
+                      </span>
+                    )) : []
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t border-slate-200">

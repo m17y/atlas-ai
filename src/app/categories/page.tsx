@@ -24,13 +24,13 @@ interface Tool {
   icon: string
   tags: string[]
   rating: number
-  reviews: number
+  reviewCount: number
   category: string
-  isFree: boolean
-  price: string
+  categoryId: string
+  pricing: 'free' | 'paid' | 'freemium'
 }
 
-async function getData() {
+async function getData(searchParams: { search?: string }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
   
   try {
@@ -41,7 +41,18 @@ async function getData() {
 
     const categories: Category[] = await categoriesRes.json()
     const toolsData = await toolsRes.json()
-    const tools: Tool[] = toolsData.tools
+    let tools: Tool[] = toolsData.tools
+
+    // Apply search filter if provided
+    if (searchParams.search) {
+      const searchLower = searchParams.search.toLowerCase()
+      tools = tools.filter(tool => 
+        tool.name.toLowerCase().includes(searchLower) ||
+        tool.description.toLowerCase().includes(searchLower) ||
+        tool.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+        tool.category.toLowerCase().includes(searchLower)
+      )
+    }
 
     return { categories, tools }
   } catch (error) {
@@ -50,10 +61,10 @@ async function getData() {
   }
 }
 
-export default async function CategoriesPage() {
-  const { categories, tools } = await getData()
+export default async function CategoriesPage({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
+  const params = await searchParams
+  const { categories, tools } = await getData(params)
 
-  // 计算每个分类的工具数量
   const categoriesWithCounts = categories.map(category => ({
     ...category,
     count: category.count || 0,
@@ -207,21 +218,21 @@ export default async function CategoriesPage() {
                       {tool.description}
                     </p>
                     <div className="flex flex-wrap gap-1.5 mb-4">
-                      {tool.tags.slice(0, 3).map((tag) => (
+                      {Array.isArray(tool.tags) ? tool.tags.slice(0, 3).map((tag) => (
                         <span key={tag} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs">
                           {tag}
                         </span>
-                      ))}
+                      )) : null}
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span className="text-sm font-medium text-slate-700">{tool.rating.toFixed(1)}</span>
-                        <span className="text-xs text-slate-400">({tool.reviews.toLocaleString()})</span>
+                        <span className="text-sm font-medium text-slate-700">{tool.rating?.toFixed(1) || '0.0'}</span>
+                        <span className="text-xs text-slate-400">({(tool.reviewCount || 0).toLocaleString()})</span>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className={`text-sm font-medium ${tool.isFree ? 'text-green-600' : 'text-slate-600'}`}>
-                          {tool.price}
+                        <span className={`text-sm font-medium ${tool.pricing === 'free' ? 'text-green-600' : 'text-slate-600'}`}>
+                          {tool.pricing === 'free' ? '免费' : tool.pricing === 'paid' ? '付费' : '免费增值'}
                         </span>
                         <Link href={`/tool/${tool.id}`} className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
                           查看 <ExternalLink className="w-3 h-3 ml-1" />

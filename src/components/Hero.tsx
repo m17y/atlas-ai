@@ -1,8 +1,22 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, Search, Zap, TrendingUp, Sparkles } from 'lucide-react'
 
 export default function Hero() {
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/categories?search=${encodeURIComponent(searchQuery.trim())}`)
+    } else {
+      router.push('/categories')
+    }
+  }
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-primary-900 to-purple-900">
       {/* Animated Background */}
@@ -31,32 +45,36 @@ export default function Hero() {
 
           {/* Search Box */}
           <div className="max-w-2xl mx-auto mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <div className="relative group">
-              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-primary-400 transition-colors" />
-              <input
-                type="text"
-                placeholder="搜索AI工具、技术、框架..."
-                className="w-full pl-14 pr-32 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-lg"
-              />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary py-2.5 px-6">
-                搜索
-              </button>
-            </div>
+            <form onSubmit={handleSearch}>
+              <div className="relative group">
+                <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-primary-400 transition-colors" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="搜索AI工具、技术、框架..."
+                  className="w-full pl-14 pr-32 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-lg"
+                />
+                <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary py-2.5 px-6">
+                  搜索
+                </button>
+              </div>
+            </form>
           </div>
 
           {/* Hot Tags */}
           <div className="flex flex-wrap justify-center gap-3 animate-slide-up" style={{ animationDelay: '0.3s' }}>
             <span className="text-white/60">今日热门：</span>
-            <Link href="/tool/chatgpt" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
+            <Link href="/tool/tool_chatgpt" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
               ChatGPT
             </Link>
-            <Link href="/tool/midjourney" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
+            <Link href="/tool/tool_midjourney" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
               Midjourney
             </Link>
-            <Link href="/tool/claude" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
+            <Link href="/tool/tool_claude" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
               Claude
             </Link>
-            <Link href="/tool/stable-diffusion" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
+            <Link href="/tool/tool_stable_diffusion" className="px-4 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white/80 hover:text-white transition-colors text-sm">
               Stable Diffusion
             </Link>
           </div>
@@ -64,16 +82,16 @@ export default function Hero() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto mt-16 animate-slide-up" style={{ animationDelay: '0.4s' }}>
             <div className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-white mb-2">2,000+</div>
+              <div className="text-3xl lg:text-4xl font-bold text-white mb-2">16+</div>
               <div className="text-white/60">AI 工具</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-white mb-2">500+</div>
-              <div className="text-white/60">技术框架</div>
+              <div className="text-3xl lg:text-4xl font-bold text-white mb-2">9</div>
+              <div className="text-white/60">分类</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-white mb-2">100K+</div>
-              <div className="text-white/60">活跃用户</div>
+              <div className="text-3xl lg:text-4xl font-bold text-white mb-2">实时</div>
+              <div className="text-white/60">数据更新</div>
             </div>
           </div>
         </div>

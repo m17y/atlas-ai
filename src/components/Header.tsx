@@ -1,11 +1,31 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Search, Menu, X, User, Sparkles } from 'lucide-react'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/categories?search=${encodeURIComponent(searchQuery.trim())}`)
+    } else {
+      router.push('/categories')
+    }
+  }
+
+  const navItems = [
+    { href: '/', label: '首页' },
+    { href: '/categories', label: '分类' },
+    { href: '/news', label: 'AI新闻' },
+    { href: '/tutorials', label: '教程' },
+    { href: '/community', label: '社区' },
+  ]
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
@@ -17,29 +37,37 @@ export default function Header() {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-              Atlas AI
+              One-Coin AI
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-primary-600 font-medium">首页</Link>
-            <Link href="/categories" className="text-slate-600 hover:text-primary-600 transition-colors">分类</Link>
-            <Link href="/trending" className="text-slate-600 hover:text-primary-600 transition-colors">排行榜</Link>
-            <Link href="/insights" className="text-slate-600 hover:text-primary-600 transition-colors">趋势</Link>
-            <Link href="/preview" className="text-slate-600 hover:text-primary-600 transition-colors">预览</Link>
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map((item) => (
+              <Link 
+                key={item.href}
+                href={item.href} 
+                className="text-slate-600 hover:text-primary-600 transition-colors font-medium"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Search Bar */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="搜索AI工具、技术、框架..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-              />
-            </div>
+          <div className="hidden md:flex items-center flex-1 max-w-sm mx-6">
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="搜索AI工具..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </form>
           </div>
 
           {/* Auth Buttons */}
@@ -64,22 +92,28 @@ export default function Header() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-200">
-            <div className="mb-4">
+            <form onSubmit={handleSearch} className="mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="搜索AI工具..."
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
-            </div>
+            </form>
             <nav className="flex flex-col space-y-3">
-              <Link href="/" className="text-primary-600 font-medium py-2">首页</Link>
-              <Link href="/categories" className="text-slate-600 py-2">分类</Link>
-              <Link href="/trending" className="text-slate-600 py-2">排行榜</Link>
-              <Link href="/insights" className="text-slate-600 py-2">趋势</Link>
-              <Link href="/preview" className="text-slate-600 py-2">预览</Link>
+              {navItems.map((item) => (
+                <Link 
+                  key={item.href}
+                  href={item.href} 
+                  className="text-slate-600 py-2 hover:text-primary-600"
+                >
+                  {item.label}
+                </Link>
+              ))}
               <div className="pt-4 border-t border-slate-200">
                 <Link href="/login" className="text-slate-600 py-2 block">登录</Link>
                 <Link href="/register" className="text-primary-600 py-2 block font-medium">注册</Link>
