@@ -19,7 +19,7 @@ interface News {
 
 function Loading() {
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+    <div className="flex-1 flex items-center justify-center">
       <div className="text-center">
         <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
         <p className="text-slate-500 mt-4">加载中...</p>
@@ -62,10 +62,10 @@ export default function AdminNewsPage() {
   return (
     <Suspense fallback={<Loading />}>
       <AdminLayout>
-        <div className="p-8">
-          <div className="flex items-center justify-between mb-8">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">新闻管理</h1>
+              <h1 className="text-2xl font-bold text-slate-900">新闻管理</h1>
               <p className="text-slate-500 mt-1">管理和发布 AI 新闻资讯</p>
             </div>
             <Link href="/admin/news/new" className="btn-primary flex items-center">
@@ -75,12 +75,9 @@ export default function AdminNewsPage() {
           </div>
 
           {loading ? (
-            <div className="card p-8 text-center">
-              <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-slate-500 mt-4">加载中...</p>
-            </div>
+            <Loading />
           ) : news.length === 0 ? (
-            <div className="card p-8 text-center">
+            <div className="card p-12 text-center">
               <p className="text-slate-500 mb-4">暂无新闻</p>
               <Link href="/admin/news/new" className="btn-primary inline-flex items-center">
                 <Plus className="w-5 h-5 mr-2" />

@@ -1,7 +1,11 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-
+1. http://localhost:3000/admin/news 页面有错位，
+2. 优化 http://localhost:3000/admin/news/cml0r3wyy000312aw7gd89qqq 这个新闻编辑页面
+3. 添加教程后台编辑功能 http://localhost:3000/tutorials
+4. 梳理还可以优化的点，并生成TODO-LIST.md
+5. 基于TODO-LIST.md 优化代码
 ---
 
 ## 历史修复记录

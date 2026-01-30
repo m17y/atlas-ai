@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, lazy, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Save, Plus, Trash2, BookOpen } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
@@ -28,6 +28,7 @@ interface TutorialFormData {
   tools: string[]
   published: boolean
   chapters: Array<{
+    id?: string
     title: string
     content: string
     order: number
@@ -49,8 +50,12 @@ function Loading() {
   )
 }
 
-export default function NewTutorialPage() {
+export default function AdminTutorialEditorPage() {
   const router = useRouter()
+  const params = useParams()
+  const isEditing = params.id && params.id !== 'new'
+
+  const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [previewMode, setPreviewMode] = useState(false)
   const [formData, setFormData] = useState<TutorialFormData>({
@@ -66,9 +71,39 @@ export default function NewTutorialPage() {
     chapters: []
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+  useEffect(() => {
+    if (isEditing) {
+      fetchTutorial()
+    }
+  }, [isEditing])
+
+  const fetchTutorial = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch(`/api/tutorials/${params.id}`)
+      if (res.ok) {
+        const tutorial = await res.json()
+        setFormData({
+          slug: tutorial.slug,
+          title: tutorial.title,
+          description: tutorial.description,
+          content: tutorial.content,
+          icon: tutorial.icon,
+          level: tutorial.level,
+          duration: tutorial.duration,
+          tools: tutorial.tools || [],
+          published: tutorial.published,
+          chapters: tutorial.chapters || []
+        })
+      }
+    } catch (error) {
+      console.error('获取教程失败:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSave = async () => {
     if (!formData.title || !formData.slug || !formData.description) {
       alert('请填写标题、slug 和描述')
       return
@@ -76,22 +111,29 @@ export default function NewTutorialPage() {
 
     try {
       setSaving(true)
-      const res = await fetch('/api/tutorials', {
-        method: 'POST',
+      const url = isEditing ? `/api/tutorials/${params.id}` : '/api/tutorials'
+      const method = isEditing ? 'PUT' : 'POST'
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
-      const data = await res.json()
-      
-      if (res.ok && data.tutorial) {
-        router.push(`/admin/tutorials/${data.tutorial.slug}`)
+      if (res.ok) {
+        const tutorial = await res.json()
+        if (!isEditing) {
+          router.push(`/admin/tutorials/${tutorial.tutorial.slug}`)
+        } else {
+          router.refresh()
+        }
       } else {
-        alert('创建失败：' + (data.error || '未知错误'))
+        const data = await res.json()
+        alert('保存失败：' + (data.error || '未知错误'))
       }
     } catch (error) {
-      console.error('创建失败:', error)
-      alert('创建失败')
+      console.error('保存失败:', error)
+      alert('保存失败')
     } finally {
       setSaving(false)
     }
@@ -148,27 +190,39 @@ export default function NewTutorialPage() {
     }))
   }
 
+  if (loading) {
+    return (
+      <Suspense fallback={<Loading />}>
+        <AdminLayout>
+          <Loading />
+        </AdminLayout>
+      </Suspense>
+    )
+  }
+
   return (
     <Suspense fallback={<Loading />}>
       <AdminLayout>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <button
-                type="button"
                 onClick={() => router.push('/admin/tutorials')}
                 className="p-2 text-slate-400 hover:text-slate-600 mr-4"
               >
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">新建教程</h1>
-                <p className="text-slate-500 mt-1">使用 Markdown 编辑教程内容</p>
+                <h1 className="text-2xl font-bold text-slate-900">
+                  {isEditing ? '编辑教程' : '新建教程'}
+                </h1>
+                <p className="text-slate-500 mt-1">
+                  使用 Markdown 编辑教程内容
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               <button
-                type="button"
                 onClick={() => setPreviewMode(!previewMode)}
                 className="btn-secondary flex items-center"
               >
@@ -176,7 +230,7 @@ export default function NewTutorialPage() {
                 {previewMode ? '编辑' : '预览'}
               </button>
               <button
-                type="submit"
+                onClick={handleSave}
                 disabled={saving}
                 className="btn-primary flex items-center"
               >
@@ -215,6 +269,7 @@ export default function NewTutorialPage() {
                       onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="tutorial-slug"
+                      disabled={isEditing}
                     />
                   </div>
 
@@ -364,11 +419,11 @@ export default function NewTutorialPage() {
                         value={tool}
                         onChange={e => updateTool(index, e.target.value)}
                         className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="工具名称"
-                      />
-                      <button
+                        placeholder="工具名称 <button
                         type="button"
-                        onClick={() => removeTool(index)}
+"
+                      />
+                                             onClick={() => removeTool(index)}
                         className="p-2 text-slate-400 hover:text-red-500"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -411,7 +466,7 @@ export default function NewTutorialPage() {
               </div>
             </div>
           </div>
-        </form>
+        </div>
       </AdminLayout>
     </Suspense>
   )
