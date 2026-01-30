@@ -1,7 +1,25 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-
+1. http://127.0.0.1:3000/trending 【对话AI】【图像生成】等按钮不能用。你需要实现这个功能，当我点击这些按钮，当前页面会展示对应分类的工具。数据从后端数据库获取。
+2. 去掉 【学习进度】卡片，教程明细页面如（http://127.0.0.1:3000/tutorials/claude-advanced），可以简单些，直接展示教程内容。但要在侧边栏分章节（侧边栏不要用卡片格式，模仿wiki那种侧边栏格式即可）。用户点击不同章节可以切换展示不同章节的内容。
+3. 工具介绍页面如（http://127.0.0.1:3000/tool/tool_runway） 去掉如 (23,000 条评价)
+4. http://127.0.0.1:3000/community 报错
+Error: 
+  × You are attempting to export "metadata" from a component marked with "use client", which is disallowed. Either remove the export, or the "use client" directive. Read more: https://nextjs.org/
+  │ docs/getting-started/react-essentials#the-use-client-directive
+  │ 
+  │ 
+    ╭─[/Users/syf/Documents/trae_projects/atlas-ai/src/app/community/page.tsx:7:1]
+  7 │ import Link from 'next/link'
+  8 │ import { MessageSquare, Github, Twitter, Mail, Users, ExternalLink, MessageCircle, Eye } from 'lucide-react'
+  9 │ 
+ 10 │ export const metadata: Metadata = {
+    ·              ────────
+ 11 │   title: '社区 - One-Coin AI',
+ 12 │   description: '加入One-Coin AI社区，与其他AI爱好者交流讨论',
+ 13 │ }
+    ╰────
 ---
 
 ## 历史修复记录

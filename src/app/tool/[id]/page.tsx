@@ -124,7 +124,6 @@ export default async function ToolPage({ params }: { params: Promise<{ id: strin
                   <div className="flex items-center space-x-1">
                     <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
                     <span className="text-2xl font-bold text-slate-900">{tool.rating.toFixed(1)}</span>
-                    <span className="text-slate-500">({tool.reviewCount.toLocaleString()} 条评价)</span>
                   </div>
                   <div className="flex items-center space-x-4">
                     <span className={`px-4 py-2 rounded-full text-sm font-medium ${

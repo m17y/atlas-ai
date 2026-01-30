@@ -1,11 +1,8 @@
-'use client'
-
-import { useState, useEffect } from 'react'
 import type { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import { MessageSquare, Github, Twitter, Mail, Users, ExternalLink, MessageCircle, Eye } from 'lucide-react'
+import { MessageSquare, Github, Mail, ExternalLink, MessageCircle, Eye } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: '社区 - One-Coin AI',
@@ -30,150 +27,46 @@ const communityStats = [
   { label: '累计消息', value: '200+' }
 ]
 
-function DiscussionsList() {
-  const [discussions, setDiscussions] = useState<Discussion[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchDiscussions() {
-      try {
-        const response = await fetch('/api/discussions')
-        const data = await response.json()
-        
-        if (data.discussions) {
-          setDiscussions(data.discussions)
-        } else {
-          setError(data.error || 'Failed to load discussions')
-        }
-      } catch (err) {
-        setError('Failed to connect to community')
-      } finally {
-        setLoading(false)
+async function getDiscussions(): Promise<Discussion[]> {
+  try {
+    const response = await fetch(
+      'https://api.github.com/repos/m17y/atlas-ai/issues?state=open&sort=updated&per_page=10',
+      {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'One-Coin-AI'
+        },
+        next: { revalidate: 300 }
       }
-    }
-
-    fetchDiscussions()
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="card">
-        <div className="p-6 border-b border-slate-200">
-          <h2 className="font-bold text-slate-900 flex items-center">
-            <MessageSquare className="w-5 h-5 mr-2" />
-            热门讨论
-          </h2>
-        </div>
-        <div className="p-8 text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-slate-500">正在加载讨论...</p>
-        </div>
-      </div>
     )
-  }
 
-  if (error) {
-    return (
-      <div className="card">
-        <div className="p-6 border-b border-slate-200">
-          <h2 className="font-bold text-slate-900 flex items-center">
-            <MessageSquare className="w-5 h-5 mr-2" />
-            热门讨论
-          </h2>
-        </div>
-        <div className="p-8 text-center">
-          <p className="text-slate-500 mb-4">{error}</p>
-          <p className="text-sm text-slate-400">请直接访问 GitHub Issues 参与讨论</p>
-        </div>
-      </div>
-    )
-  }
+    if (!response.ok) return []
 
-  return (
-    <div className="card">
-      <div className="p-6 border-b border-slate-200">
-        <h2 className="font-bold text-slate-900 flex items-center">
-          <MessageSquare className="w-5 h-5 mr-2" />
-          GitHub 热门讨论
-        </h2>
-      </div>
-      
-      <div className="divide-y divide-slate-100">
-        {discussions.length > 0 ? (
-          discussions.map((topic) => (
-            <div key={topic.id} className="p-6 hover:bg-slate-50 transition-colors">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="font-medium text-slate-900 mb-2 hover:text-primary-600">
-                    <a href={topic.url} target="_blank" rel="noopener noreferrer">
-                      {topic.title}
-                    </a>
-                  </h3>
-                  <div className="flex items-center gap-4 text-sm text-slate-500">
-                    <span>{topic.author}</span>
-                    <span>•</span>
-                    <span>{topic.lastActive}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-slate-500">
-                  <span className="flex items-center">
-                    <MessageCircle className="w-4 h-4 mr-1" />
-                    {topic.replies}
-                  </span>
-                  <span className="flex items-center">
-                    <Eye className="w-4 h-4 mr-1" />
-                    {topic.views}
-                  </span>
-                </div>
-              </div>
-              {topic.tags.length > 0 && (
-                <div className="flex gap-2 mt-3">
-                  {topic.tags.slice(0, 3).map((tag, i) => (
-                    <span key={i} className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="p-8 text-center text-slate-500">
-            <p>暂无讨论</p>
-            <a 
-              href="https://github.com/m17y/atlas-ai/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-flex items-center"
-            >
-              成为第一个发起讨论的人 <ExternalLink className="w-4 h-4 ml-1" />
-            </a>
-          </div>
-        )}
-      </div>
-      
-      <div className="p-6 border-t border-slate-200">
-        <a 
-          href="https://github.com/m17y/atlas-ai/issues"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary w-full flex items-center justify-center"
-        >
-          <ExternalLink className="w-5 h-5 mr-2" />
-          查看所有讨论
-        </a>
-      </div>
-    </div>
-  )
+    const issues = await response.json()
+
+    return issues.map((issue: any) => ({
+      id: issue.id,
+      title: issue.title,
+      author: issue.user?.login || 'Anonymous',
+      replies: issue.comments,
+      views: issue.reactions?.total_count || 0,
+      lastActive: new Date(issue.updated_at).toLocaleDateString('zh-CN'),
+      tags: issue.labels?.map((label: any) => label.name) || [],
+      url: issue.html_url
+    }))
+  } catch (error) {
+    console.error('Failed to fetch discussions:', error)
+    return []
+  }
 }
 
-export default function CommunityPage() {
+export default async function CommunityPage() {
+  const discussions = await getDiscussions()
+
   return (
     <main className="min-h-screen bg-slate-50">
       <Header />
 
-      {/* Breadcrumb */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="text-sm">
@@ -185,7 +78,6 @@ export default function CommunityPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero */}
         <div className="text-center mb-12">
           <MessageSquare className="w-16 h-16 text-primary-600 mx-auto mb-6" />
           <h1 className="text-4xl font-bold text-slate-900 mb-4">社区讨论</h1>
@@ -194,7 +86,6 @@ export default function CommunityPage() {
           </p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
           {communityStats.map((stat, index) => (
             <div key={index} className="card p-6 text-center">
@@ -205,14 +96,84 @@ export default function CommunityPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2">
-            <DiscussionsList />
+            <div className="card">
+              <div className="p-6 border-b border-slate-200">
+                <h2 className="font-bold text-slate-900 flex items-center">
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  GitHub 热门讨论
+                </h2>
+              </div>
+              
+              <div className="divide-y divide-slate-100">
+                {discussions.length > 0 ? (
+                  discussions.map((topic) => (
+                    <div key={topic.id} className="p-6 hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-medium text-slate-900 mb-2 hover:text-primary-600">
+                            <a href={topic.url} target="_blank" rel="noopener noreferrer">
+                              {topic.title}
+                            </a>
+                          </h3>
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <span>{topic.author}</span>
+                            <span>•</span>
+                            <span>{topic.lastActive}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-slate-500">
+                          <span className="flex items-center">
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            {topic.replies}
+                          </span>
+                          <span className="flex items-center">
+                            <Eye className="w-4 h-4 mr-1" />
+                            {topic.views}
+                          </span>
+                        </div>
+                      </div>
+                      {topic.tags.length > 0 && (
+                        <div className="flex gap-2 mt-3">
+                          {topic.tags.slice(0, 3).map((tag, i) => (
+                            <span key={i} className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-slate-500">
+                    <p>暂无讨论</p>
+                    <a 
+                      href="https://github.com/m17y/atlas-ai/issues"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-600 hover:text-primary-700 text-sm mt-2 inline-flex items-center"
+                    >
+                      成为第一个发起讨论的人 <ExternalLink className="w-4 h-4 ml-1" />
+                    </a>
+                  </div>
+                )}
+              </div>
+              
+              <div className="p-6 border-t border-slate-200">
+                <a 
+                  href="https://github.com/m17y/atlas-ai/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary w-full flex items-center justify-center"
+                >
+                  <ExternalLink className="w-5 h-5 mr-2" />
+                  查看所有讨论
+                </a>
+              </div>
+            </div>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Join Community */}
             <div className="card p-6 bg-gradient-to-br from-primary-600 to-purple-600 text-white">
               <h3 className="font-bold text-lg mb-4">加入社区</h3>
               <p className="text-white/80 mb-6 text-sm">
@@ -240,7 +201,6 @@ export default function CommunityPage() {
               </div>
             </div>
 
-            {/* Community Guidelines */}
             <div className="card p-6">
               <h3 className="font-bold text-slate-900 mb-4">社区准则</h3>
               <ul className="space-y-3 text-sm text-slate-600">
@@ -263,7 +223,6 @@ export default function CommunityPage() {
               </ul>
             </div>
 
-            {/* Contact */}
             <div className="card p-6">
               <h3 className="font-bold text-slate-900 mb-4">联系我们</h3>
               <div className="space-y-3">
