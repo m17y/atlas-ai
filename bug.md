@@ -1,11 +1,14 @@
 # Bug 修复清单
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
-1. http://localhost:3000/admin/news 页面有错位，
-2. 优化 http://localhost:3000/admin/news/cml0r3wyy000312aw7gd89qqq 这个新闻编辑页面
-3. 添加教程后台编辑功能 http://localhost:3000/tutorials
-4. 梳理还可以优化的点，并生成TODO-LIST.md
-5. 基于TODO-LIST.md 优化代码
+
+✅ **2025-02-02 本次完成**：
+1. ✅ `/admin/news` 页面错位 - 修复 padding 问题
+2. ✅ 新闻编辑页面优化 - 统一使用 AdminLayoutWrapper
+3. ✅ 教程后台编辑功能 - 创建 `/admin/tutorials/[id]` 页面
+4. ✅ 生成 TODO-LIST.md - 梳理优化点
+5. ✅ 基于 TODO-LIST.md 优化代码 - 统一后台布局
+
 ---
 
 ## 历史修复记录
@@ -13,6 +16,23 @@
 按时间线排序，简要总结每个修复周期。
 
 ### 2025-02-02
+
+**本次修复包含 5 项改进**
+
+1. ✅ **/admin/news 页面布局错位** - 移除双重 padding，简化布局结构
+2. ✅ **新闻编辑页面优化** - 统一使用 AdminLayoutWrapper，添加 Markdown 预览
+3. ✅ **教程后台编辑功能** - 创建 `/admin/tutorials/[slug]/page.tsx`，支持章节管理
+4. ✅ **后台布局统一** - 所有后台页面使用 AdminLayoutWrapper
+5. ✅ **生成 TODO-LIST.md** - 梳理后续可优化项
+
+**新增功能：**
+- 教程 Markdown 编辑器（@uiw/react-md-editor）
+- 教程章节管理（添加/编辑/删除章节）
+- 后台页面统一加载状态
+
+---
+
+### 2025-02-02（上午）
 
 **本次修复包含 4 项改进**
 
@@ -95,11 +115,14 @@
 | 社区 | http://localhost:3000/community |
 | 新闻列表 | http://localhost:3000/news |
 | 新闻详情 | http://localhost:3000/news/1 |
+| 教程列表 | http://localhost:3000/tutorials |
 | 教程详情 | http://localhost:3000/tutorials/chatgpt-starter |
-| 工具详情 | http://localhost:3000/tool/tool_chatgpt |
-| 管理员登录 | http://localhost:3000/admin/login |
+| 教程管理 | http://localhost:3000/admin/tutorials |
+| 新建教程 | http://localhost:3000/admin/tutorials/new |
+| 编辑教程 | http://localhost:3000/admin/tutorials/chatgpt-starter |
 | 新闻管理 | http://localhost:3000/admin/news |
 | 系统设置 | http://localhost:3000/admin/settings |
+| 管理员登录 | http://localhost:3000/admin/login |
 
 ---
 
