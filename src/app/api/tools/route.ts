@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  errorResponse,
+  handleApiError,
+  parseIntParam,
+  parseBooleanParam,
+  parseJsonArray,
+  buildPaginationMeta,
+} from '@/lib/api'
 
 export async function GET(request: Request) {
   try {
@@ -10,24 +19,24 @@ export async function GET(request: Request) {
     const trending = searchParams.get('trending')
     const latest = searchParams.get('latest')
     const search = searchParams.get('search')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '12')
+    const page = parseIntParam(searchParams.get('page'), 1, 1)
+    const limit = parseIntParam(searchParams.get('limit'), 12, 1, 100)
 
-    const where: any = {}
+    const where: Record<string, unknown> = {}
 
     if (category) {
       where.categoryId = category
     }
 
-    if (featured === 'true') {
+    if (parseBooleanParam(featured, false)) {
       where.featured = true
     }
 
-    if (trending === 'true') {
+    if (parseBooleanParam(trending, false)) {
       where.trending = true
     }
 
-    if (latest === 'true') {
+    if (parseBooleanParam(latest, false)) {
       where.latest = true
     }
 
@@ -56,24 +65,17 @@ export async function GET(request: Request) {
       prisma.tool.count({ where }),
     ])
 
-    return NextResponse.json({
+    const pagination = buildPaginationMeta(page, limit, total)
+
+    return successResponse({
       tools: tools.map(tool => ({
         ...tool,
-        tags: JSON.parse(tool.tags),
+        tags: parseJsonArray(tool.tags),
       })),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      pagination,
     })
   } catch (error) {
-    console.error('Error fetching tools:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch tools' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'GET /api/tools')
   }
 }
 
@@ -96,6 +98,10 @@ export async function POST(request: Request) {
       latest,
     } = body
 
+    if (!name || !description || !categoryId || !pricing || !icon) {
+      return errorResponse('Missing required fields: name, description, categoryId, pricing, icon', 400, 'VALIDATION_ERROR')
+    }
+
     const tool = await prisma.tool.create({
       data: {
         name,
@@ -113,12 +119,8 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json(tool, { status: 201 })
+    return successResponse(tool, 201)
   } catch (error) {
-    console.error('Error creating tool:', error)
-    return NextResponse.json(
-      { error: 'Failed to create tool' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'POST /api/tools')
   }
 }

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { successResponse, handleApiError } from '@/lib/api'
 
 export async function GET() {
   try {
@@ -27,7 +27,7 @@ export async function GET() {
       }),
     ])
 
-    return NextResponse.json({
+    return successResponse({
       totalTools,
       totalCategories,
       featuredTools,
@@ -37,10 +37,6 @@ export async function GET() {
       toolsByPricing,
     })
   } catch (error) {
-    console.error('Error fetching statistics:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch statistics' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'GET /api/statistics')
   }
 }

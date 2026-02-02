@@ -1,12 +1,19 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  errorResponse,
+  validationError,
+  handleApiError,
+} from '@/lib/api'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { tutorialId, title, content, order } = body
+
+    if (!tutorialId || !title) {
+      return validationError('Tutorial ID and title are required')
+    }
 
     const chapter = await prisma.tutorialChapter.create({
       data: {
@@ -17,7 +24,6 @@ export async function POST(request: Request) {
       }
     })
 
-    // Update tutorial chapter count
     const chapterCount = await prisma.tutorialChapter.count({
       where: { tutorialId }
     })
@@ -27,10 +33,9 @@ export async function POST(request: Request) {
       data: { chapterCount }
     })
 
-    return NextResponse.json({ chapter })
+    return successResponse({ chapter }, 201)
   } catch (error) {
-    console.error('Failed to create chapter:', error)
-    return NextResponse.json({ error: 'Failed to create chapter' }, { status: 500 })
+    return handleApiError(error, 'POST /api/tutorials/chapters')
   }
 }
 
@@ -38,6 +43,10 @@ export async function PUT(request: Request) {
   try {
     const body = await request.json()
     const { id, tutorialId, title, content, order } = body
+
+    if (!id || !title) {
+      return validationError('Chapter ID and title are required')
+    }
 
     const chapter = await prisma.tutorialChapter.update({
       where: { id },
@@ -48,10 +57,9 @@ export async function PUT(request: Request) {
       }
     })
 
-    return NextResponse.json({ chapter })
+    return successResponse({ chapter })
   } catch (error) {
-    console.error('Failed to update chapter:', error)
-    return NextResponse.json({ error: 'Failed to update chapter' }, { status: 500 })
+    return handleApiError(error, 'PUT /api/tutorials/chapters')
   }
 }
 
@@ -61,7 +69,7 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json({ error: 'Chapter ID required' }, { status: 400 })
+      return validationError('Chapter ID is required')
     }
 
     const chapter = await prisma.tutorialChapter.findUnique({
@@ -73,7 +81,6 @@ export async function DELETE(request: Request) {
         where: { id }
       })
 
-      // Update tutorial chapter count
       const chapterCount = await prisma.tutorialChapter.count({
         where: { tutorialId: chapter.tutorialId }
       })
@@ -84,9 +91,8 @@ export async function DELETE(request: Request) {
       })
     }
 
-    return NextResponse.json({ success: true })
+    return successResponse({ success: true })
   } catch (error) {
-    console.error('Failed to delete chapter:', error)
-    return NextResponse.json({ error: 'Failed to delete chapter' }, { status: 500 })
+    return handleApiError(error, 'DELETE /api/tutorials/chapters')
   }
 }

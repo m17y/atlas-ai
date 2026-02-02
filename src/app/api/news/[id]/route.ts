@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  notFoundError,
+  handleApiError,
+} from '@/lib/api'
 
 export async function GET(
   request: Request,
@@ -14,18 +16,12 @@ export async function GET(
     })
 
     if (!news) {
-      return NextResponse.json(
-        { error: '新闻未找到' },
-        { status: 404 }
-      )
+      return notFoundError(`News with id '${id}' not found`)
     }
 
-    return NextResponse.json(news)
+    return successResponse(news)
   } catch (error) {
-    return NextResponse.json(
-      { error: '获取新闻失败' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'GET /api/news/[id]')
   }
 }
 
@@ -52,12 +48,9 @@ export async function PUT(
       }
     })
 
-    return NextResponse.json(news)
+    return successResponse(news)
   } catch (error) {
-    return NextResponse.json(
-      { error: '更新新闻失败' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'PUT /api/news/[id]')
   }
 }
 
@@ -70,11 +63,8 @@ export async function DELETE(
     await prisma.news.delete({
       where: { id }
     })
-    return NextResponse.json({ success: true })
+    return successResponse({ success: true })
   } catch (error) {
-    return NextResponse.json(
-      { error: '删除新闻失败' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'DELETE /api/news/[id]')
   }
 }

@@ -1,5 +1,10 @@
-import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  notFoundError,
+  handleApiError,
+  parseJsonArray,
+} from '@/lib/api'
 
 export async function GET(
   request: Request,
@@ -23,22 +28,15 @@ export async function GET(
     })
 
     if (!tool) {
-      return NextResponse.json(
-        { error: 'Tool not found' },
-        { status: 404 }
-      )
+      return notFoundError(`Tool with id '${id}' not found`)
     }
 
-    return NextResponse.json({
+    return successResponse({
       ...tool,
-      tags: JSON.parse(tool.tags),
+      tags: parseJsonArray(tool.tags),
     })
   } catch (error) {
-    console.error('Error fetching tool:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch tool' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'GET /api/tools/[id]')
   }
 }
 
@@ -83,13 +81,9 @@ export async function PUT(
       },
     })
 
-    return NextResponse.json(tool)
+    return successResponse(tool)
   } catch (error) {
-    console.error('Error updating tool:', error)
-    return NextResponse.json(
-      { error: 'Failed to update tool' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'PUT /api/tools/[id]')
   }
 }
 
@@ -104,12 +98,8 @@ export async function DELETE(
       where: { id },
     })
 
-    return NextResponse.json({ message: 'Tool deleted successfully' })
+    return successResponse({ message: 'Tool deleted successfully' })
   } catch (error) {
-    console.error('Error deleting tool:', error)
-    return NextResponse.json(
-      { error: 'Failed to delete tool' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'DELETE /api/tools/[id]')
   }
 }

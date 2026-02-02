@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  notFoundError,
+  validationError,
+  handleApiError,
+} from '@/lib/api'
 
 export async function GET(
   request: Request,
@@ -19,13 +22,12 @@ export async function GET(
     })
 
     if (!tutorial) {
-      return NextResponse.json({ error: 'Tutorial not found' }, { status: 404 })
+      return notFoundError(`Tutorial with slug '${slug}' not found`)
     }
 
-    return NextResponse.json({ tutorial })
+    return successResponse({ tutorial })
   } catch (error) {
-    console.error('Failed to fetch tutorial:', error)
-    return NextResponse.json({ error: 'Failed to fetch tutorial' }, { status: 500 })
+    return handleApiError(error, 'GET /api/tutorials/[slug]')
   }
 }
 
@@ -52,10 +54,9 @@ export async function PUT(
       }
     })
 
-    return NextResponse.json({ tutorial })
+    return successResponse({ tutorial })
   } catch (error) {
-    console.error('Failed to update tutorial:', error)
-    return NextResponse.json({ error: 'Failed to update tutorial' }, { status: 500 })
+    return handleApiError(error, 'PUT /api/tutorials/[slug]')
   }
 }
 
@@ -69,9 +70,8 @@ export async function DELETE(
       where: { slug }
     })
 
-    return NextResponse.json({ success: true })
+    return successResponse({ success: true })
   } catch (error) {
-    console.error('Failed to delete tutorial:', error)
-    return NextResponse.json({ error: 'Failed to delete tutorial' }, { status: 500 })
+    return handleApiError(error, 'DELETE /api/tutorials/[slug]')
   }
 }

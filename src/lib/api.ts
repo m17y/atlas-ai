@@ -1,103 +1,115 @@
-export interface Tool {
-  id: string
-  name: string
-  description: string
-  categoryId: string
-  category?: Category
-  pricing: 'free' | 'paid' | 'freemium'
-  rating: number
-  reviewCount: number
-  tags: string[]
-  icon: string
-  website?: string
-  featured: boolean
-  trending: boolean
-  latest: boolean
+import { NextResponse } from 'next/server'
+
+export interface ApiError {
+  code: string
+  message: string
+  details?: Record<string, unknown>
 }
 
-export interface Category {
-  id: string
-  name: string
-  description: string
-  icon: string
-  count: number
+export interface ApiResponse<T = unknown> {
+  success: boolean
+  data?: T
+  error?: ApiError
+  timestamp: string
 }
 
-export interface ToolResponse {
-  tools: Tool[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
+export function successResponse<T>(data: T, status: number = 200): NextResponse<ApiResponse<T>> {
+  return NextResponse.json({
+    success: true,
+    data,
+    timestamp: new Date().toISOString(),
+  }, { status })
 }
 
-const API_BASE = '/api'
+export function errorResponse(
+  message: string,
+  status: number = 500,
+  code: string = 'INTERNAL_ERROR',
+  details?: Record<string, unknown>
+): NextResponse<ApiResponse> {
+  return NextResponse.json({
+    success: false,
+    error: {
+      code,
+      message,
+      details,
+    },
+    timestamp: new Date().toISOString(),
+  }, { status })
+}
 
-export async function getTools(params?: {
-  category?: string
-  featured?: boolean
-  trending?: boolean
-  latest?: boolean
-  search?: string
-  page?: number
-  limit?: number
-}): Promise<Tool[]> {
-  const searchParams = new URLSearchParams()
-  
-  if (params?.category) searchParams.set('category', params.category)
-  if (params?.featured) searchParams.set('featured', 'true')
-  if (params?.trending) searchParams.set('trending', 'true')
-  if (params?.latest) searchParams.set('latest', 'true')
-  if (params?.search) searchParams.set('search', params.search)
-  if (params?.page) searchParams.set('page', params.page.toString())
-  if (params?.limit) searchParams.set('limit', params.limit.toString())
+export function validationError(message: string, details?: Record<string, unknown>): NextResponse<ApiResponse> {
+  return errorResponse(message, 400, 'VALIDATION_ERROR', details)
+}
 
-  const response = await fetch(`${API_BASE}/tools?${searchParams.toString()}`, {
-    cache: 'no-store',
+export function notFoundError(message: string): NextResponse<ApiResponse> {
+  return errorResponse(message, 404, 'NOT_FOUND')
+}
+
+export function unauthorizedError(message: string = 'Unauthorized'): NextResponse<ApiResponse> {
+  return errorResponse(message, 401, 'UNAUTHORIZED')
+}
+
+export function forbiddenError(message: string = 'Forbidden'): NextResponse<ApiResponse> {
+  return errorResponse(message, 403, 'FORBIDDEN')
+}
+
+export function conflictError(message: string): NextResponse<ApiResponse> {
+  return errorResponse(message, 409, 'CONFLICT')
+}
+
+export function handleApiError(error: unknown, context: string): NextResponse<ApiResponse> {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+  const errorStack = error instanceof Error ? error.stack : undefined
+
+  console.error(`[API Error] ${context}:`, {
+    message: errorMessage,
+    stack: errorStack,
+    timestamp: new Date().toISOString(),
   })
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch tools')
+  if (error instanceof SyntaxError && error.message.includes('JSON')) {
+    return validationError('Invalid JSON in request body')
   }
 
-  const data: ToolResponse = await response.json()
-  return data.tools
+  return errorResponse('An error occurred while processing your request', 500, 'INTERNAL_ERROR')
 }
 
-export async function getTool(id: string): Promise<Tool> {
-  const response = await fetch(`${API_BASE}/tools/${id}`, {
-    cache: 'no-store',
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch tool')
-  }
-
-  return response.json()
+export function parseIntParam(value: string | null, defaultValue: number, min?: number, max?: number): number {
+  const parsed = parseInt(value || String(defaultValue), 10)
+  if (isNaN(parsed)) return defaultValue
+  if (min !== undefined && parsed < min) return min
+  if (max !== undefined && parsed > max) return max
+  return parsed
 }
 
-export async function getCategories(): Promise<Category[]> {
-  const response = await fetch(`${API_BASE}/categories`, {
-    cache: 'no-store',
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch categories')
-  }
-
-  return response.json()
+export function parseBooleanParam(value: string | null, defaultValue: boolean): boolean {
+  if (value === null) return defaultValue
+  return value === 'true' || value === '1'
 }
 
-export async function getStatistics() {
-  const response = await fetch(`${API_BASE}/statistics`, {
-    cache: 'no-store',
-  })
+export function sanitizeString(value: unknown, defaultValue: string = ''): string {
+  if (typeof value !== 'string') return defaultValue
+  return value.trim() || defaultValue
+}
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch statistics')
+export function parseJsonArray<T>(value: string, fallback: T[] = []): T[] {
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) ? parsed : fallback
+  } catch {
+    return fallback
   }
+}
 
-  return response.json()
+export function buildPaginationMeta(page: number, limit: number, total: number) {
+  const totalPages = Math.ceil(total / limit)
+  return {
+    page,
+    limit,
+    total,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  }
 }

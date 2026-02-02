@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  errorResponse,
+  handleApiError,
+} from '@/lib/api'
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const categories = await prisma.category.findMany({
       include: {
@@ -14,18 +19,14 @@ export async function GET(request: Request) {
       orderBy: { name: 'asc' },
     })
 
-    return NextResponse.json(
+    return successResponse(
       categories.map(category => ({
         ...category,
         count: category.tools.length,
       }))
     )
   } catch (error) {
-    console.error('Error fetching categories:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch categories' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'GET /api/categories')
   }
 }
 
@@ -35,6 +36,10 @@ export async function POST(request: Request) {
     
     const { name, description, icon } = body
 
+    if (!name || !description || !icon) {
+      return errorResponse('Missing required fields: name, description, icon', 400, 'VALIDATION_ERROR')
+    }
+
     const category = await prisma.category.create({
       data: {
         name,
@@ -43,12 +48,8 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json(category, { status: 201 })
+    return successResponse(category, 201)
   } catch (error) {
-    console.error('Error creating category:', error)
-    return NextResponse.json(
-      { error: 'Failed to create category' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'POST /api/categories')
   }
 }

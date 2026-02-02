@@ -6,7 +6,7 @@ Atlas AI 是一个专注于发现、探索和体验前沿人工智能工具、�
 
 ## 设计风格
 
-- 现代简约美学，灵感来自 product hunt 和 alternative.me
+- 现代简约美学，灵感来自 [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) 和 [skills.sh](https://skills.sh/)
 - 浅色配色方案，带有柔和阴影和圆角
 - 响应式布局，支持所有设备（手机、平板、桌面）
 - 使用 CSS/Tailwind 实现平滑动画和过渡效果

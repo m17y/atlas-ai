@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  errorResponse,
+  validationError,
+  handleApiError,
+} from '@/lib/api'
 
 export async function GET() {
   try {
@@ -21,10 +24,9 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json({ tutorials })
+    return successResponse({ tutorials })
   } catch (error) {
-    console.error('Failed to fetch tutorials:', error)
-    return NextResponse.json({ error: 'Failed to fetch tutorials' }, { status: 500 })
+    return handleApiError(error, 'GET /api/tutorials')
   }
 }
 
@@ -32,6 +34,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { slug, title, description, content, icon, level, duration, tools, published } = body
+
+    if (!slug || !title || !description) {
+      return validationError('Slug, title and description are required')
+    }
 
     const tutorial = await prisma.tutorial.create({
       data: {
@@ -48,9 +54,8 @@ export async function POST(request: Request) {
       }
     })
 
-    return NextResponse.json({ tutorial })
+    return successResponse({ tutorial }, 201)
   } catch (error) {
-    console.error('Failed to create tutorial:', error)
-    return NextResponse.json({ error: 'Failed to create tutorial' }, { status: 500 })
+    return handleApiError(error, 'POST /api/tutorials')
   }
 }

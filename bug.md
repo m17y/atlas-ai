@@ -2,12 +2,6 @@
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
 
-1. http://localhost:3000/admin/news 出现2个新闻管理
-![alt text](image.png)
-2. http://localhost:3000/admin
-3. ❌ `net::ERR_TOO_MANY_REDIRECTS` - API请求重定向循环
-4. ❌ `net::ERR_ABORTED` - 路由切换时请求被中止
-
 ---
 
 ## 历史修复记录

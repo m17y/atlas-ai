@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { successResponse } from '@/lib/api'
 
 export async function POST() {
   cookies().delete('admin_token')
-  return NextResponse.json({ success: true })
+  return successResponse({ success: true })
 }

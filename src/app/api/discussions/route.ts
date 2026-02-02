@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server'
+import {
+  successResponse,
+  handleApiError,
+} from '@/lib/api'
 
 export async function GET() {
   try {
     const owner = 'm17y'
     const repo = 'atlas-ai'
     
-    // Fetch issues from GitHub API
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/issues?state=open&sort=updated&per_page=10`,
       {
@@ -13,7 +15,7 @@ export async function GET() {
           'Accept': 'application/vnd.github.v3+json',
           'User-Agent': 'One-Coin-AI'
         },
-        next: { revalidate: 300 } // Cache for 5 minutes
+        next: { revalidate: 300 }
       }
     )
 
@@ -23,7 +25,6 @@ export async function GET() {
 
     const issues = await response.json()
 
-    // Transform issues to our format
     const discussions = issues.map((issue: any) => ({
       id: issue.id,
       title: issue.title,
@@ -35,12 +36,8 @@ export async function GET() {
       url: issue.html_url
     }))
 
-    return NextResponse.json({ discussions })
+    return successResponse({ discussions })
   } catch (error) {
-    console.error('Failed to fetch GitHub issues:', error)
-    return NextResponse.json({ 
-      discussions: [],
-      error: 'Failed to fetch discussions' 
-    }, { status: 500 })
+    return handleApiError(error, 'GET /api/discussions')
   }
 }

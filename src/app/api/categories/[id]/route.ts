@@ -1,5 +1,10 @@
-import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  errorResponse,
+  notFoundError,
+  handleApiError,
+} from '@/lib/api'
 
 export async function DELETE(
   request: Request,
@@ -8,29 +13,21 @@ export async function DELETE(
   try {
     const { id } = await params
 
-    // Check if category has tools
     const toolCount = await prisma.tool.count({
       where: { categoryId: id },
     })
 
     if (toolCount > 0) {
-      return NextResponse.json(
-        { error: 'Cannot delete category with tools' },
-        { status: 400 }
-      )
+      return errorResponse('Cannot delete category with associated tools', 400, 'CONFLICT')
     }
 
     await prisma.category.delete({
       where: { id },
     })
 
-    return NextResponse.json({ message: 'Category deleted successfully' })
+    return successResponse({ message: 'Category deleted successfully' })
   } catch (error) {
-    console.error('Error deleting category:', error)
-    return NextResponse.json(
-      { error: 'Failed to delete category' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'DELETE /api/categories/[id]')
   }
 }
 
@@ -53,12 +50,8 @@ export async function PUT(
       },
     })
 
-    return NextResponse.json(category)
+    return successResponse(category)
   } catch (error) {
-    console.error('Error updating category:', error)
-    return NextResponse.json(
-      { error: 'Failed to update category' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'PUT /api/categories/[id]')
   }
 }

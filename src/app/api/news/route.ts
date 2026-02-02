@@ -1,19 +1,20 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import {
+  successResponse,
+  errorResponse,
+  validationError,
+  handleApiError,
+  parseJsonArray,
+} from '@/lib/api'
 
 export async function GET() {
   try {
     const news = await prisma.news.findMany({
       orderBy: { date: 'desc' }
     })
-    return NextResponse.json(news)
+    return successResponse(news)
   } catch (error) {
-    return NextResponse.json(
-      { error: '获取新闻列表失败' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'GET /api/news')
   }
 }
 
@@ -23,10 +24,7 @@ export async function POST(request: Request) {
     const { title, date, category, summary, content, image, tags, published } = body
 
     if (!title || !summary || !content) {
-      return NextResponse.json(
-        { error: '标题、摘要和内容不能为空' },
-        { status: 400 }
-      )
+      return validationError('Title, summary and content are required')
     }
 
     const news = await prisma.news.create({
@@ -42,12 +40,8 @@ export async function POST(request: Request) {
       }
     })
 
-    return NextResponse.json(news, { status: 201 })
+    return successResponse(news, 201)
   } catch (error) {
-    console.error('Create news error:', error)
-    return NextResponse.json(
-      { error: '创建新闻失败' },
-      { status: 500 }
-    )
+    return handleApiError(error, 'POST /api/news')
   }
 }
