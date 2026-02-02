@@ -1,18 +1,8 @@
 'use client'
 
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, Search, Filter, Edit, Trash2, Eye, Star, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
-
-const AdminLayout = lazy(() => import('../AdminLayoutWrapper'))
-const Loading = () => (
-  <div className="flex-1 flex items-center justify-center">
-    <div className="text-center">
-      <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-slate-500 mt-4">加载中...</p>
-    </div>
-  </div>
-)
 
 interface Tool {
   id: string
@@ -125,15 +115,13 @@ export default function AdminToolsPage() {
   }
 
   return (
-    <Suspense fallback={<Loading />}>
-      <AdminLayout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-end">
-            <Link href="/admin/tools/new" className="btn-primary flex items-center space-x-2">
-              <Plus className="w-5 h-5" />
-              <span>添加工具</span>
-            </Link>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <Link href="/admin/tools/new" className="btn-primary flex items-center space-x-2">
+          <Plus className="w-5 h-5" />
+          <span>添加工具</span>
+        </Link>
+      </div>
 
       {/* Filters */}
       <div className="card p-4">
@@ -326,8 +314,6 @@ export default function AdminToolsPage() {
           </div>
         </div>
       )}
-        </div>
-      </AdminLayout>
-    </Suspense>
+    </div>
   )
 }
