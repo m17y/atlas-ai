@@ -134,7 +134,7 @@
 - [ ] TypeScript 类型完善
 - [ ] React Hook 规范化
 - [ ] CSS 类名统一（BEM 规范）
-- [ ] API 错误处理统一
+- [x] API 错误处理统一
 - [ ] 日志系统完善
 - [ ] 单元测试覆盖
 - [ ] API 文档自动化
@@ -175,6 +175,11 @@
 - ✅ 改进认证检查逻辑
 - ✅ 修复 ERR_ABORTED 错误（AbortController）
 - ✅ 改进 API 请求缓存和错误处理
+- ✅ **统一 API 错误处理规范** - 创建 src/lib/api.ts 工具模块
+  - 统一的响应格式: `{ success, data, error, timestamp }`
+  - 预定义错误类型: validationError, notFoundError, unauthorizedError 等
+  - 统一错误日志记录
+  - 工具函数: parseIntParam, parseBooleanParam, parseJsonArray 等
 
 ### 2026-01-02
 
