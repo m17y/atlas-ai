@@ -34,18 +34,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [hasChecked, setHasChecked] = useState(false)
 
   useEffect(() => {
     if (pathname === '/admin/login') {
       setLoading(false)
+      setHasChecked(true)
       return
     }
     
     const adminAuth = localStorage.getItem('admin_auth')
     if (adminAuth === 'true') {
       setIsAuthenticated(true)
+      setHasChecked(true)
       setLoading(false)
     } else {
+      setHasChecked(true)
       setLoading(false)
       router.push('/admin/login')
     }
@@ -71,6 +75,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (pathname === '/admin/login') {
     return children
+  }
+
+  if (!hasChecked) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-500 mt-4">验证身份中...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!isAuthenticated) {
