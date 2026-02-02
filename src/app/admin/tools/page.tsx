@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Link from 'next/link'
 import {
   Plus,
@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
+
+const AdminLayout = lazy(() => import('../AdminLayoutWrapper'))
 
 interface Tool {
   id: string
@@ -126,7 +128,9 @@ export default function AdminToolsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <Suspense fallback={<Loading />}>
+      <AdminLayout>
+        <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -330,6 +334,19 @@ export default function AdminToolsPage() {
           </div>
         </div>
       )}
+    </div>
+      </AdminLayout>
+    </Suspense>
+  )
+}
+
+function Loading() {
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-slate-500 mt-4">加载中...</p>
+      </div>
     </div>
   )
 }
