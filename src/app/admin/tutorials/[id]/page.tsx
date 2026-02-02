@@ -269,7 +269,7 @@ export default function AdminTutorialEditorPage() {
                       onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="tutorial-slug"
-                      disabled={isEditing}
+                      disabled={Boolean(isEditing)}
                     />
                   </div>
 
@@ -419,11 +419,11 @@ export default function AdminTutorialEditorPage() {
                         value={tool}
                         onChange={e => updateTool(index, e.target.value)}
                         className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="工具名称 <button
-                        type="button"
-"
+                        placeholder="工具名称"
                       />
-                                             onClick={() => removeTool(index)}
+                      <button
+                        type="button"
+                        onClick={() => removeTool(index)}
                         className="p-2 text-slate-400 hover:text-red-500"
                       >
                         <Trash2 className="w-5 h-5" />
