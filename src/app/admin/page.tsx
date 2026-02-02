@@ -10,6 +10,7 @@ import {
   Clock,
   Star,
   Eye,
+  Newspaper,
 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -178,6 +179,14 @@ export default async function AdminDashboard() {
               </div>
               <h3 className="font-medium text-slate-900">添加工具</h3>
               <p className="text-sm text-slate-500 mt-1">添加新的 AI 工具</p>
+            </Link>
+
+            <Link href="/admin/news/new" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                <Newspaper className="w-5 h-5 text-blue-600" />
+              </div>
+              <h3 className="font-medium text-slate-900">发布新闻</h3>
+              <p className="text-sm text-slate-500 mt-1">发布最新的 AI 资讯</p>
             </Link>
 
             <Link href="/admin/categories" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
