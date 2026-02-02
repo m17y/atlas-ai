@@ -2,12 +2,36 @@
 
 > **重要提示**：详细的修复记录保存在 [`.bug-records/`](.bug-records/) 目录下，包含完整的问题分析、修复方案和涉及文件。
 
+1. http://localhost:3000/admin/news 出现2个新闻管理
+![alt text](image.png)
+2. http://localhost:3000/admin
+3. ❌ `net::ERR_TOO_MANY_REDIRECTS` - API请求重定向循环
+4. ❌ `net::ERR_ABORTED` - 路由切换时请求被中止
 
 ---
 
 ## 历史修复记录
 
 按时间线排序，简要总结每个修复周期。
+
+### 2026-02-02
+
+**本次修复包含 5 项改进**
+
+1. ✅ **Admin 页面布局问题** - 移除所有页面中重复的 AdminLayoutWrapper 引用，统一使用 layout.tsx
+2. ✅ **AdminLayoutWrapper 组件删除** - 删除不再使用的组件文件
+3. ✅ **API 请求重定向循环** - 改进认证检查逻辑，添加 hasChecked 状态防止重定向循环
+4. ✅ **API 请求缓存和错误处理** - 添加 cache: 'no-store' 和响应状态检查
+5. ✅ **ERR_ABORTED 错误** - 使用 AbortController 防止组件卸载时请求被中止
+
+**提交记录**：
+- `728e4f1` fix: 使用AbortController防止请求被中止导致的ERR_ABORTED错误
+- `6a45001` fix: 改进AdminLayout认证检查逻辑，防止重定向循环
+- `a5287e4` fix: 改进API请求的缓存和错误处理
+- `ad57654` fix: 移除所有admin页面中的AdminLayoutWrapper引用
+- `81e1c93` refactor: 删除不再使用的AdminLayoutWrapper组件
+
+---
 
 ### 2026-01-02
 
