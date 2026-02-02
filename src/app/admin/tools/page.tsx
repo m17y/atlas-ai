@@ -40,36 +40,54 @@ export default function AdminToolsPage() {
   const limit = 10
 
   useEffect(() => {
-    fetchData()
-  }, [currentPage, categoryFilter])
+    const controller = new AbortController()
+    let isMounted = true
 
-  async function fetchData() {
-    try {
-      const [toolsRes, categoriesRes] = await Promise.all([
-        fetch(`/api/tools?page=${currentPage}&limit=${limit}${categoryFilter ? `&category=${categoryFilter}` : ''}`, {
-          cache: 'no-store',
-        }),
-        fetch('/api/categories', {
-          cache: 'no-store',
-        }),
-      ])
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const [toolsRes, categoriesRes] = await Promise.all([
+          fetch(`/api/tools?page=${currentPage}&limit=${limit}${categoryFilter ? `&category=${categoryFilter}` : ''}`, {
+            cache: 'no-store',
+            signal: controller.signal,
+          }),
+          fetch('/api/categories', {
+            cache: 'no-store',
+            signal: controller.signal,
+          }),
+        ])
 
-      if (!toolsRes.ok || !categoriesRes.ok) {
-        throw new Error('Failed to fetch data')
+        if (!isMounted) return
+
+        if (!toolsRes.ok || !categoriesRes.ok) {
+          throw new Error('Failed to fetch data')
+        }
+
+        const toolsData = await toolsRes.json()
+        const categoriesData = await categoriesRes.json()
+
+        setTools(toolsData.tools || [])
+        setTotalPages(toolsData.pagination?.totalPages || 1)
+        setCategories(categoriesData || [])
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          return
+        }
+        console.error('Failed to fetch data:', error)
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
       }
-
-      const toolsData = await toolsRes.json()
-      const categoriesData = await categoriesRes.json()
-
-      setTools(toolsData.tools || [])
-      setTotalPages(toolsData.pagination?.totalPages || 1)
-      setCategories(categoriesData || [])
-    } catch (error) {
-      console.error('Failed to fetch data:', error)
-    } finally {
-      setLoading(false)
     }
-  }
+
+    fetchData()
+
+    return () => {
+      isMounted = false
+      controller.abort()
+    }
+  }, [currentPage, categoryFilter])
 
   async function handleSearch() {
     setLoading(true)
@@ -82,13 +100,23 @@ export default function AdminToolsPage() {
       if (search) params.append('search', search)
       if (categoryFilter) params.append('category', categoryFilter)
 
-      const response = await fetch(`/api/tools?${params.toString()}`)
+      const response = await fetch(`/api/tools?${params.toString()}`, {
+        cache: 'no-store',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Search failed')
+      }
+      
       const data = await response.json()
       
       setTools(data.tools || [])
       setTotalPages(data.pagination?.totalPages || 1)
       setCurrentPage(1)
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return
+      }
       console.error('Search failed:', error)
     } finally {
       setLoading(false)
@@ -102,7 +130,13 @@ export default function AdminToolsPage() {
       await fetch(`/api/tools/${toolToDelete.id}`, { method: 'DELETE' })
       setShowDeleteModal(false)
       setToolToDelete(null)
-      fetchData()
+      
+      const toolsRes = await fetch(`/api/tools?page=${currentPage}&limit=${limit}${categoryFilter ? `&category=${categoryFilter}` : ''}`, {
+        cache: 'no-store',
+      })
+      const toolsData = await toolsRes.json()
+      setTools(toolsData.tools || [])
+      setTotalPages(toolsData.pagination?.totalPages || 1)
     } catch (error) {
       console.error('Delete failed:', error)
     }
