@@ -1,190 +1,305 @@
-# AI Technology Showcase Website Project
+# AI Technology Navigation Platform Project
 
 ## Project Overview
-Create a modern, responsive website for showcasing the latest AI technologies, tools, and trends. The website should be clean, professional, and easy to navigate.
+
+Atlas AI is a comprehensive platform for discovering, exploring, and experiencing cutting-edge artificial intelligence tools, frameworks, and technologies. The platform features an AI tool navigation system, trending rankings, news feed, tutorial system, and a full-featured admin dashboard.
 
 ## Design Style
-- Minimalist design inspired by skills.sh
-- Clean and modern aesthetic
-- Light color scheme with subtle shadows
-- Responsive layout for all devices
-- Smooth animations and transitions
+
+- Modern, clean aesthetic inspired by product hunt and alternative.me
+- Light color scheme with subtle shadows and rounded corners
+- Responsive layout for all devices (mobile, tablet, desktop)
+- Smooth animations and transitions using CSS/Tailwind
+- Clear visual hierarchy and intuitive navigation
 
 ## Technical Stack
-- Framework: Next.js 14 with App Router
-- Language: TypeScript
-- Styling: Tailwind CSS 3
-- Animations: Framer Motion
-- Icons: Lucide React
+
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 3
+- **Database**: SQLite with Prisma ORM
+- **Icons**: Lucide React
+- **Markdown Editor**: @uiw/react-md-editor
+- **Utilities**: clsx, tailwind-merge
 
 ## Project Structure
+
 ```
 src/
-├── app/
-│   ├── page.tsx                    # Homepage
-│   ├── layout.tsx                  # Root layout
-│   ├── globals.css                 # Global styles
-│   ├── categories/
-│   │   └── page.tsx                # Categories listing
-│   ├── trending/
-│   │   └── page.tsx                # Trending tools ranking
-│   ├── insights/
-│   │   └── page.tsx                # AI trends and insights
-│   └── tool/
-│       └── [id]/
-│           └── page.tsx            # Tool detail page
-├── components/
-│   ├── Header.tsx                  # Navigation header
-│   ├── Hero.tsx                    # Hero section
-│   ├── Featured.tsx                # Featured AI tools
-│   ├── Trending.tsx                # Trending tools section
-│   ├── Categories.tsx              # Categories section
-│   ├── Latest.tsx                  # Latest tools section
-│   ├── Insights.tsx                # Insights section
-│   └── Footer.tsx                  # Footer
-├── data/
-│   └── tools.ts                    # Mock data for AI tools
-└── types/
-    └── index.ts                    # TypeScript interfaces
+├── app/                           # Next.js App Router pages
+│   ├── page.tsx                   # Homepage
+│   ├── layout.tsx                 # Root layout
+│   ├── globals.css                # Global styles
+│   ├── api/                       # API routes
+│   │   ├── tools/                 # Tools CRUD API
+│   │   ├── categories/            # Categories API
+│   │   ├── news/                  # News API
+│   │   ├── tutorials/             # Tutorials API
+│   │   ├── admin/                 # Admin auth API
+│   │   └── discussions/           # GitHub discussions API
+│   ├── admin/                     # Admin dashboard pages
+│   │   ├── login/                 # Admin login
+│   │   ├── tools/                 # Tool management
+│   │   ├── categories/            # Category management
+│   │   ├── news/                  # News management
+│   │   ├── tutorials/             # Tutorial management
+│   │   ├── analytics/             # Analytics dashboard
+│   │   └── settings/              # System settings
+│   ├── categories/                # Categories listing
+│   ├── category/[slug]/           # Category detail page
+│   ├── trending/                  # Trending tools ranking
+│   ├── news/                      # News listing
+│   ├── news/[id]/                 # News detail
+│   ├── tutorials/                 # Tutorial listing
+│   ├── tutorials/[slug]/          # Tutorial detail with chapters
+│   ├── tool/[id]/                 # Tool detail page
+│   ├── community/                 # GitHub discussions
+│   ├── insights/                  # AI trends and insights
+│   ├── open-source/               # Open source projects
+│   └── api-docs/                  # API documentation
+├── components/                    # React components
+│   ├── Header.tsx                 # Navigation header
+│   ├── Hero.tsx                   # Hero section
+│   ├── Featured.tsx               # Featured tools
+│   ├── Trending.tsx               # Trending tools
+│   ├── Categories.tsx             # Categories grid
+│   ├── Latest.tsx                 # Latest tools
+│   ├── Insights.tsx               # AI insights
+│   └── Footer.tsx                 # Footer
+├── lib/                           # Utilities
+│   ├── prisma.ts                  # Prisma client
+│   ├── api.ts                     # API utilities
+│   └── icons.ts                   # Icon configurations
+└── types/                         # TypeScript types
 ```
 
-## Main Pages and Components
+## Database Schema (Prisma)
 
-### Homepage (src/app/page.tsx)
-Include the following sections in order:
-1. Header - Sticky navigation with logo, search, and links
-2. Hero - Large hero section with tagline and CTA buttons
-3. Featured - Featured AI tools section
-4. Trending - Trending tools ranking
-5. Categories - AI tool categories with icons
-6. Latest - Latest AI tools and releases
-7. Insights - AI technology insights and trends
-8. Footer - Footer with links and information
-
-### Categories Page (src/app/categories/page.tsx)
-- Grid layout of all AI tool categories
-- Each category shows:
-  - Category icon
-  - Category name
-  - Tool count
-  - Brief description
-  - Link to filtered tools
-
-### Trending Page (src/app/trending/page.tsx)
-- List of trending AI tools ranked by popularity
-- Each tool card shows:
-  - Rank number
-  - Tool name and icon
-  - Category badge
-  - Description
-  - Rating/review count
-  - Visit button
-
-### Insights Page (src/app/insights/page.tsx)
-- AI technology trend analysis
-- Articles/posts about AI developments
-- Statistics and charts (optional)
-
-### Tool Detail Page (src/app/tool/[id]/page.tsx)
-- Full information about a specific AI tool
-- Includes:
-  - Tool name and logo
-  - Category and tags
-  - Detailed description
-  - Pricing information (Free/Paid/Freemium)
-  - Rating and reviews
-  - Visit website button
-  - Screenshot or preview image
-  - Related tools
-
-## Data Structure
-
-Create a tools data file with the following interface:
-```typescript
-interface Tool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  pricing: 'free' | 'paid' | 'freemium';
-  rating: number;
-  reviewCount: number;
-  tags: string[];
-  icon: string;
-  website?: string;
-  featured?: boolean;
-  trending?: boolean;
-  latest?: boolean;
+```prisma
+model Tool {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  pricing     String   // free, paid, freemium
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  tags        String   // JSON array as string
+  icon        String
+  website     String?
+  featured    Boolean  @default(false)
+  trending    Boolean  @default(false)
+  latest      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reviews     Review[]
 }
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  count: number;
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  count       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tools       Tool[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
+  favorites Favorite[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  content   String?
+  rating    Float
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  toolId    String
+  tool      Tool     @relation(fields: [toolId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Favorite {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  toolId String
+  createdAt DateTime @default(now())
+  @@unique([userId, toolId])
+}
+
+model Tutorial {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  content     String   // Markdown content
+  icon        String
+  level       String   // beginner, intermediate, advanced
+  duration    String   // e.g., "15 minutes"
+  tools       String   // JSON array of tool names
+  chapterCount Int     @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  chapters    TutorialChapter[]
+}
+
+model TutorialChapter {
+  id          String   @id @default(cuid())
+  tutorialId  String
+  tutorial    Tutorial @relation(fields: [tutorialId], references: [id])
+  title       String
+  content     String   // Markdown content
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  date      String
+  category  String
+  summary   String
+  content   String   // Markdown content
+  image     String
+  tags      String   // JSON array as string
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 ```
 
-## Sample Data
+## Main Pages
 
-Include at least 10 AI tools across different categories:
-- ChatGPT, Claude, Midjourney, Stable Diffusion (Image Generation)
-- GitHub Copilot, Cursor (Code Generation)
-- Jasper, Copy.ai (Content Writing)
-- Runway, Pika (Video Generation)
-- ElevenLabs, Murf (Audio/Voice)
-- Perplexity, You.com (AI Search)
+### Frontend Pages
 
-## Styling Guidelines
+| Page | Path | Description |
+|------|------|-------------|
+| Homepage | `/` | Featured, trending, categories |
+| Categories | `/categories` | All AI tool categories |
+| Category Detail | `/category/[slug]` | Tools in specific category |
+| Trending | `/trending` | Popular AI tools ranking |
+| Tool Detail | `/tool/[id]` | Detailed tool information |
+| News List | `/news` | AI news and updates |
+| News Detail | `/news/[id]` | Full news article |
+| Tutorials | `/tutorials` | Learning tutorials list |
+| Tutorial Detail | `/tutorials/[slug]` | Tutorial with chapters |
+| Community | `/community` | GitHub discussions |
+| Admin Login | `/admin/login` | Admin authentication |
 
-### Tailwind Configuration
-- Custom color palette (primary colors from indigo/purple range)
-- Custom animations (fade-in, slide-up, slide-down)
-- Responsive breakpoints (mobile, tablet, desktop)
+### Admin Dashboard Pages
 
-### Component Styling
-- Cards: White background, rounded corners, subtle shadows
-- Buttons: Primary color background, hover effects
-- Badges: Small, colored, rounded
-- Typography: Clean sans-serif fonts
-- Spacing: Generous whitespace between sections
+| Page | Path | Description |
+|------|------|-------------|
+| Dashboard | `/admin` | Overview statistics |
+| Tools | `/admin/tools` | Manage AI tools |
+| Categories | `/admin/categories` | Manage categories |
+| News | `/admin/news` | Manage news |
+| Tutorials | `/admin/tutorials` | Manage tutorials |
+| Analytics | `/admin/analytics` | Platform statistics |
+| Settings | `/admin/settings` | System configuration |
 
-## Implementation Steps
+## Admin Authentication
 
-1. Initialize Next.js project:
-   ```bash
-   npx create-next-app@latest ai-tech-hub --typescript --tailwind --eslint
-   cd ai-tech-hub
-   npm install framer-motion lucide-react clsx tailwind-merge
-   ```
+- **Default credentials**: admin / password
+- **Environment variables**: `ADMIN_USERNAME`, `ADMIN_PASSWORD`
+- Uses httpOnly cookies for session management
 
-2. Create folder structure and files
+## Key Features
 
-3. Implement components and pages
-
-4. Add mock data
-
-5. Test responsiveness and functionality
-
-6. Build and verify
-
-## Key Features to Implement
+### Frontend
 - Responsive navigation with mobile menu
-- Search functionality
-- Category filtering
-- Smooth page transitions
-- Hover effects on cards
-- Loading states
-- Error handling
+- Search functionality across categories
+- Tool filtering by category
+- Pagination for lists
+- Markdown rendering for tutorials/news
+- GitHub API integration for community discussions
+- Tooltips and hover effects
 
-## Important Notes
-- Use proper TypeScript types
-- Follow React best practices
-- Ensure accessibility (ARIA labels, keyboard navigation)
-- Optimize images and performance
-- Use semantic HTML
-- Maintain consistent design language
+### Admin Dashboard
+- Full CRUD operations for tools, categories, news, tutorials
+- Markdown editor for content creation
+- Chapter management for tutorials
+- Responsive admin layout with sidebar navigation
+- Authentication protection
+- Loading and error states
 
-## Example Reference
-Design inspired by skills.sh - clean, minimalist, focused on content presentation.
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tools` | List tools with pagination |
+| GET | `/api/tools/[id]` | Get single tool |
+| POST | `/api/tools` | Create tool |
+| PUT | `/api/tools/[id]` | Update tool |
+| DELETE | `/api/tools/[id]` | Delete tool |
+| GET | `/api/categories` | List categories |
+| GET | `/api/news` | List news |
+| GET | `/api/tutorials` | List tutorials |
+| POST | `/api/admin/login` | Admin login |
+
+## Implementation Guidelines
+
+1. Use TypeScript for all files
+2. Follow React best practices (hooks, memoization)
+3. Ensure accessibility (ARIA labels, keyboard navigation)
+4. Use semantic HTML elements
+5. Maintain consistent design language
+6. Optimize for performance (lazy loading, caching)
+7. Handle errors gracefully with user-friendly messages
+8. Use Prisma for all database operations
+9. Keep API routes simple and RESTful
+
+## Styling Conventions
+
+- Use Tailwind CSS utility classes
+- Custom colors in `tailwind.config.js` (primary: indigo/purple)
+- Consistent spacing using Tailwind's scale
+- Rounded corners (rounded-xl, rounded-2xl)
+- Subtle shadows (shadow-sm, shadow-md)
+- Smooth transitions (transition-all duration-200)
+- Loading animations (spin pulse)
+- Hover effects on interactive elements
+
+## Development Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Generate Prisma client
+npx prisma generate
+
+# Run database migrations
+npx prisma migrate dev
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm run start
+```
+
+## Environment Variables
+
+```env
+DATABASE_URL="file:./dev.db"
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="password"
+```
