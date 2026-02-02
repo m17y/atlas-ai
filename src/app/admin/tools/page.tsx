@@ -46,9 +46,17 @@ export default function AdminToolsPage() {
   async function fetchData() {
     try {
       const [toolsRes, categoriesRes] = await Promise.all([
-        fetch(`/api/tools?page=${currentPage}&limit=${limit}${categoryFilter ? `&category=${categoryFilter}` : ''}`),
-        fetch('/api/categories'),
+        fetch(`/api/tools?page=${currentPage}&limit=${limit}${categoryFilter ? `&category=${categoryFilter}` : ''}`, {
+          cache: 'no-store',
+        }),
+        fetch('/api/categories', {
+          cache: 'no-store',
+        }),
       ])
+
+      if (!toolsRes.ok || !categoriesRes.ok) {
+        throw new Error('Failed to fetch data')
+      }
 
       const toolsData = await toolsRes.json()
       const categoriesData = await categoriesRes.json()
