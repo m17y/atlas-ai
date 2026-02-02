@@ -44,10 +44,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const adminAuth = localStorage.getItem('admin_auth')
     if (adminAuth === 'true') {
       setIsAuthenticated(true)
+      setLoading(false)
     } else {
+      setLoading(false)
       router.push('/admin/login')
     }
-    setLoading(false)
   }, [pathname, router])
 
   const handleLogout = async () => {
